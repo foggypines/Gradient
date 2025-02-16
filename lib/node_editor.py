@@ -1,0 +1,137 @@
+# Copyright 2021 LuminousLizard
+# Licensed under the MIT-License
+
+import dearpygui.dearpygui as dpg
+from . node_manager import func_chain_update, func_link_destroyed, node_destroyed, LinkList, save_state, load_state
+from . nodes import *
+from . node_position import LastNodePosition
+
+# Destroy window if closed
+def callback_close_window(sender):
+    dpg.delete_item(sender)
+
+
+# Delete selected items
+def callback_delete_item(sender):
+    for selected_node in dpg.get_selected_nodes("NodeEditor"):
+        # Deleting node and attached links
+        ## Extract all children of the deleted node
+        selected_node_children = dpg.get_item_children(selected_node)[1]
+        ## Extract all existing links in the Node Editor
+        nodeEditor_links = dpg.get_item_children("NodeEditor")[0]
+        ## Iterate through NodeEditor elements and delete attached links
+        for link in nodeEditor_links:
+            if dpg.get_item_configuration(link)["attr_1"] in selected_node_children or dpg.get_item_configuration(link)["attr_2"] in selected_node_children:
+                #dpg.delete_item(link)
+                func_link_destroyed("NodeEditor", link)
+        ## Iterate trough LinkList and remove attached links
+        for item in LinkList:
+            for sub_item in item:
+                if dpg.get_item_alias(selected_node) in sub_item:
+                    LinkList.remove(item) 
+
+        # Deleting node
+
+        #node_destroyed(dpg.get_item_alias(selected_node))
+        
+        # Deleting node
+        dpg.delete_item(selected_node)
+    for selected_link in dpg.get_selected_links("NodeEditor"):
+        func_link_destroyed("NodeEditor", selected_link)
+
+
+class NodeEditor:
+    def __init__(self):
+
+        dpg.add_button(label="Save state",
+                       callback=save_state)
+        dpg.add_button(label="Load state",
+                       callback=load_state)
+
+        with dpg.window(tag="NodeEditorWindow",
+                        label="Node editor",
+                        width=1000,
+                        height=700,
+                        pos=[50, 50],
+                        menubar=True,
+                        on_close=callback_close_window):
+            pass
+            
+            #Add a menu bar to the window
+            with dpg.menu_bar(label="MenuBar"):
+                
+                with dpg.menu(label="Input/Output"):
+                    dpg.add_menu_item(tag="Menu_AddNode_InputFloat",
+                                      label="Input float",
+                                      callback=node_input_float.add_node_input_float,
+                                      user_data="Input_Float")
+                    dpg.add_menu_item(tag="Menu_AddNode_Array",
+                                      label="Array",
+                                      callback=node_array.add_node_input_array,
+                                      user_data="Array")
+                    dpg.add_menu_item(tag="Menu AddNode_Random_Array",
+                                      label="Random Array",
+                                      callback=node_array_random.add_node_rand_array)
+                    dpg.add_menu_item(tag="Menu AddNode_Readout",
+                                      label="Readout",
+                                      callback=node_readout.add_node_readout)
+
+                with dpg.menu(label = "Math"):
+                    dpg.add_menu_item(tag="Menu_AddNode_Expression",
+                                      label="Expression",
+                                      callback=node_expression.add_node_expr,
+                                      user_data="Expression")
+                    
+                with dpg.menu(label = "Data Manipulation"):
+                    dpg.add_menu_item(tag = "Menu_stack_data",
+                                      label = "Stack Data",
+                                      callback = node_stack_data.add_node_stack_data)
+                    dpg.add_menu_item(tag = "Menu_delete_index_data",
+                                      label = "Delete Index Data",
+                                      callback = node_delete_index.add_node_delete_index_data)
+
+                with dpg.menu(label="Primitive Geometry"):
+                    node_point.node_point_instance.add_menu_item()
+
+                with dpg.menu(label = "Evaluate"):
+                    dpg.add_menu_item(tag = "Menu_AddNode_CloestPoint",
+                                      label = "Closest Point",
+                                      callback = node_closest_point.add_node_closest_point,
+                                      user_data="Closest Point")
+
+                with dpg.menu(label="Solid Geometry"):
+                    node_sphere.node_sphere_instance.add_menu_item()
+                    dpg.add_menu_item(tag="Menu_AddNode_Cylinder",
+                                        label="Cylinder",
+                                        callback=node_cylinder.add_node_cylinder,
+                                        user_data="Cylinder")
+                    dpg.add_menu_item(tag="Menu_AddNode_Union",
+                                      label="Union",
+                                      callback=node_union.add_node_union_data,
+                                      user_data="Union")
+
+            with dpg.group(horizontal=True):
+                dpg.add_text("Status:")
+                dpg.add_text(tag="InfoBar")
+
+            # Add node editor to the window
+            with dpg.node_editor(tag="NodeEditor",
+                                 # Function call for updating all nodes if a new link is created
+                                 callback=func_chain_update,
+                                 # Function call for updating if a link is destroyed
+                                 delink_callback=func_link_destroyed):
+                pass
+
+            with dpg.handler_registry():
+                dpg.add_mouse_click_handler(callback=save_last_node_position)
+
+            with dpg.handler_registry():
+                dpg.add_key_release_handler(key=dpg.mvKey_Delete, callback=callback_delete_item)
+
+# Saving the position of the last selected node
+def save_last_node_position():
+    global LastNodePosition
+    if dpg.get_selected_nodes("NodeEditor") == []:
+        pass
+    else:
+        LastNodePosition = dpg.get_item_pos(dpg.get_selected_nodes("NodeEditor")[0])
