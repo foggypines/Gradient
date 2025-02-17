@@ -1,7 +1,6 @@
 import numpy as np
 from .node_base_func import BaseNodeFunction
 from .node_input import NodeInput, all_node_inputs
-from .link import Link
 from ... lib.utility import prepend_exclamation, append_value
 from ... lib.fusionAddInUtils.general_utils import log
 from dataclasses import dataclass, field

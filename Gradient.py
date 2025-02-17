@@ -1,5 +1,16 @@
-#Author-
-#Description-
+#Author-Dylan Rice
+#Description-Node based geometry editor.
+
+#Add modules to system path to allow for direct imports.
+
+import os
+import sys
+
+dirname = os.path.dirname(__file__)
+
+mod_name = os.path.join(dirname, 'modules')
+
+sys.path.append(mod_name)
 
 import adsk.core, adsk.fusion, adsk.cam, traceback
 import threading
