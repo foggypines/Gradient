@@ -51,6 +51,8 @@ class ExpressionNodeFunction(BaseNodeFunction):
 
             b = self.b_var.parameter
 
+            pi = np.pi
+
             self.result = ne.evaluate(expr)
 
             if self.result.size == 1:

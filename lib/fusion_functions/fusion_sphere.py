@@ -23,6 +23,7 @@ class SphereEventHandler(BaseEventHandler):
             eventArgs = json.loads(args.additionalInfo)
 
             compute = bool(eventArgs['compute'])
+            delete = bool(eventArgs['delete'])
             node_id = str(eventArgs['node_id'])
 
             #Runs when it times to actually add BRep bodies to the active design
@@ -35,7 +36,13 @@ class SphereEventHandler(BaseEventHandler):
 
                 attr_len = len(attributes)
 
-                sphere_len = len(self.spheres)
+                if delete:
+
+                    sphere_len = 0
+
+                else:
+
+                    sphere_len = len(self.spheres)
 
                 bodies = self.rootcomp.bRepBodies
 
@@ -103,9 +110,10 @@ class SphereEventHandler(BaseEventHandler):
                 self.ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
             adsk.autoTerminate(False)
 
-    def make_sphere(self, x,y,z, radius, node_id, compute = False):
+    def make_sphere(self, x,y,z, radius, node_id, compute = False, delete = False):
 
-        return_data = {'x': x, 'y': y, 'z': z, 'radius': radius, 'node_id': node_id, 'compute': compute}
+        return_data = {'x': x, 'y': y, 'z': z, 'radius': radius,
+                        'node_id': node_id, 'compute': compute, 'delete': delete}
 
         return_json = json.dumps(return_data)
 

@@ -3,6 +3,7 @@ from . node_input import NodeInput, all_node_inputs
 from ... lib.utility import prepend_exclamation, append_value
 from ... lib.fusionAddInUtils.general_utils import log
 from dataclasses import dataclass, field
+from ... lib.enums import *
 
 node_name = "Sphere"
 node_type = prepend_exclamation(node_name)
@@ -65,10 +66,18 @@ class SphereNodeFunction(BaseNodeFunction):
             else:
                 i = i + 1
 
-        make_sphere(0,0,0, 0, self.gui_id, True)
+        make_sphere(0,0,0, 0, self.gui_id, compute = True)
 
         for link in self.links:
 
             node_input = all_node_inputs[link.end]
 
             node_input.update(self.gui_id)
+
+        if sender is not None:
+
+            self.update()
+
+    def delete(self):
+
+        make_sphere(0,0,0, 0, self.gui_id, compute = True, delete = True)

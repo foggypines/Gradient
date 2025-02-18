@@ -38,4 +38,6 @@ class DeleteIndexNodeFunction(BaseNodeFunction):
 
             node_input.update(self.result)
 
-        # self.update()
+        if sender is not None: 
+            
+            self.update()

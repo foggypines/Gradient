@@ -32,7 +32,7 @@ def callback_delete_item(sender):
 
         # Deleting node
 
-        #node_destroyed(dpg.get_item_alias(selected_node))
+        node_destroyed(dpg.get_item_alias(selected_node))
         
         # Deleting node
         dpg.delete_item(selected_node)

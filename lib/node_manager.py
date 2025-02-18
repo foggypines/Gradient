@@ -12,12 +12,6 @@ import orjson
 
 LinkList = []
 
-# function_node_dict = {}
-
-# def simplify_alias(full_alias):
-
-#     return full_alias.split('_')[0]
-
 # Function for updating all interconnected nodes if a link was created or a value has changed
 def func_chain_update(sender, app_data):
     # sender = "NodeEditor" for links
@@ -80,12 +74,20 @@ def func_chain_update(sender, app_data):
 
         log("compute started")
 
-        start.compute()
+        start.compute(sender = sender)
 
         log(f"link finished")
 
 def node_destroyed(alias):
     
+    #Run the nodes delete method
+
+    node_func = function_node_dict[alias]
+
+    node_func.delete()
+
+    #Cleanup all references to the node function
+
     del function_node_dict[alias]
 
     entries_to_delete = []
@@ -118,26 +120,6 @@ def func_link_destroyed(sender, data):
 
     start = function_node_dict[input_alias]
 
-    #check if there are any other links between the start and next node
-
-    other_links = False
-
-    for link in start.links:
-
-        if link.end == output_full_alias:
-
-            other_links = True
-
-            break
-
-    #I have many questions about this if statement
-
-    #if there are no other links then remove next from the starts outputs
-
-    # if other_links == False:
-
-    #     start.outputs.remove(output_alias)
-
     start.outputs.remove(output_alias)
 
     #delete links to node inputs
@@ -156,7 +138,7 @@ def func_link_destroyed(sender, data):
 
     try:
 
-        next.compute()
+        next.compute(sender = sender)
 
     except:
 

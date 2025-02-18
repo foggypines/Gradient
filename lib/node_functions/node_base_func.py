@@ -47,16 +47,9 @@ class BaseNodeFunction(JSONWizard):
                 output_obj.populate_tree(tree = tree, branch = new_branch)
 
         return tree
-
-    # def update(self):
-
-    #     if self.outputs != [] or self.outputs == 0:
-
-    #         for output in self.outputs:
-
-    #             output_obj = function_node_dict[output]
-
-    #             output_obj.compute()
+    
+    def delete(self):
+        pass
 
     def parameter_update(self, input, input_name, val):
         

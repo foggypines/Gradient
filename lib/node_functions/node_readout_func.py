@@ -40,4 +40,6 @@ class ReadoutNodeFunction(BaseNodeFunction):
 
             node_input.update(self.input.parameter) #pass the parameter through
 
-        self.update()
+        if sender is not None:
+
+            self.update()

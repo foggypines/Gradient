@@ -11,7 +11,7 @@ class UnionEventHandler(BaseEventHandler):
     def __init__(self, app, ui, design, base_feature):
         BaseEventHandler.__init__(self, app, ui, design, base_feature )
         self.tokens = []
-        
+                
     def notify(self, args):
         try:
             # Make sure a command isn't running before changes are made.
@@ -24,49 +24,66 @@ class UnionEventHandler(BaseEventHandler):
             node_a_input = str(eventArgs['node_a_input'])
             node_b_input = str(eventArgs['node_b_input'])
             node_id_input = str(eventArgs['node_id'])
+            delete = bool(eventArgs['delete'])
 
-            #make a temp brep sphere
+            if delete:
 
-            temp_brep_mgr = adsk.fusion.TemporaryBRepManager.get()
+                attrs = self.design.findAttributres("Node", node_id_input)
 
-            #Runs when it times to actually add BRep bodies to the active design
+                for attr in attrs:
 
-            attributes_a = self.design.findAttributes("Node", node_a_input)
+                    body = self.design.findEntityByToken(attr.value)
 
-            body_a = self.design.findEntityByToken(attributes_a[0].value)[0]
+                    attr.deleteMe()
 
-            body_a_temp = temp_brep_mgr.copy(body_a)
+                    if body is not None:
 
-            attributes_b = self.design.findAttributes("Node", node_b_input)
-            
-            for attr in attributes_b:
+                        body.deleteMe()
 
-                body_b = self.design.findEntityByToken(attr.value)[0]
+                adsk.doEvents()
 
-                body_b_temp = temp_brep_mgr.copy(body_b)
+            else:
 
-                temp_brep_mgr.booleanOperation(body_a_temp, body_b_temp, adsk.fusion.BooleanTypes.UnionBooleanType)
-                                               
-            self.base_feature.updateBody(body_a, body_a_temp)
+                temp_brep_mgr = adsk.fusion.TemporaryBRepManager.get()
 
-            adsk.doEvents()
+                #Runs when it times to actually add BRep bodies to the active design
 
-            self.assign_default_color(body_a)
+                attributes_a = self.design.findAttributes("Node", node_a_input)
 
-            token = body_a.entityToken
+                body_a = self.design.findEntityByToken(attributes_a[0].value)[0]
 
-            self.tokens.append(token)
+                body_a_temp = temp_brep_mgr.copy(body_a)
 
-            body_a.attributes.add("Node", node_id_input, token)
+                attributes_b = self.design.findAttributes("Node", node_b_input)
+                
+                for attr in attributes_b:
+
+                    body_b = self.design.findEntityByToken(attr.value)[0]
+
+                    body_b_temp = temp_brep_mgr.copy(body_b)
+
+                    temp_brep_mgr.booleanOperation(body_a_temp, body_b_temp, adsk.fusion.BooleanTypes.UnionBooleanType)
+                                                
+                self.base_feature.updateBody(body_a, body_a_temp)
+
+                adsk.doEvents()
+
+                self.assign_default_color(body_a)
+
+                token = body_a.entityToken
+
+                self.tokens.append(token)
+
+                body_a.attributes.add("Node", node_id_input, token)
 
         except:
             if self.ui:
                 self.ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
             adsk.autoTerminate(False)
 
-    def union_bodies(self, node_a_input, node_b_input, node_id):
+    def union_bodies(self, node_a_input, node_b_input, node_id, delete = False):
 
-        return_data = {'node_a_input': node_a_input, 'node_b_input': node_b_input, 'node_id': node_id}
+        return_data = {'node_a_input': node_a_input, 'node_b_input': node_b_input, 'node_id': node_id, 'delete': delete}
 
         return_json = json.dumps(return_data)
 

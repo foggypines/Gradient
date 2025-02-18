@@ -41,3 +41,7 @@ class UnionNodeFunction(BaseNodeFunction):
             node_input = all_node_inputs[link.end]
 
             node_input.update(self.gui_id)
+
+    def delete(self):
+
+        union_bodies(self.node_a_input.parameter[0], self.node_b_input.parameter[0], self.gui_id, delete = True)

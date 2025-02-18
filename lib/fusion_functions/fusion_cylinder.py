@@ -24,6 +24,7 @@ class CylinderEventHandler(BaseEventHandler):
             eventArgs = json.loads(args.additionalInfo)
 
             compute = bool(eventArgs['compute'])
+            delete = bool(eventArgs['delete'])
             node_id = str(eventArgs['node_id'])
 
             #Runs when it times to actually add BRep bodies to the active design
@@ -36,7 +37,13 @@ class CylinderEventHandler(BaseEventHandler):
 
                 attr_len = len(attributes)
 
-                cylinder_len = len(self.cylinders)
+                if delete:
+
+                    cylinder_len = 0
+
+                else:
+
+                    cylinder_len = len(self.cylinders)
 
                 bodies = self.rootcomp.bRepBodies
 
@@ -82,40 +89,6 @@ class CylinderEventHandler(BaseEventHandler):
 
                 self.cylinders.clear()
 
-                #Delete any old cylinders
-
-                # if self.tokens != []:
-
-                #     for t in self.tokens:
-
-                #         old_cylinder = self.design.findEntityByToken(t)
-
-                #         for c in old_cylinder:
-
-                #             for attr in c.attributes:
-
-                #                 if attr.name == node_id:
-
-                #                     c.deleteMe()
-
-                # bodies = self.rootcomp.bRepBodies
-
-                # #add the sphere to the active designs bodies
-
-                # for cylinder in self.cylinders:
-
-                #     body = bodies.add(cylinder, self.base_feature)
-
-                #     self.assign_default_color(body)
-
-                #     token = body.entityToken
-
-                #     self.tokens.append(token)
-
-                #     body.attributes.add("Node", node_id, "")
-
-                # self.cylinders.clear() #clear out the spheres list
-
             else:
 
                 point_x = float(eventArgs['point_x']) * 0.1
@@ -145,11 +118,11 @@ class CylinderEventHandler(BaseEventHandler):
                 self.ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
             adsk.autoTerminate(False)
 
-    def make_cylinder(self, point, vector, radius, node_id, compute = False):
+    def make_cylinder(self, point, vector, radius, node_id, compute = False, delete = False):
 
         return_data = {'point_x': point[0], 'point_y': point[1], 'point_z': point[2],
                        'vector_x': vector[0], 'vector_y': vector[1], 'vector_z': vector[2],
-                        'radius': radius, 'node_id': node_id, 'compute': compute}
+                        'radius': radius, 'node_id': node_id, 'compute': compute, 'delete': delete}
 
         return_json = json.dumps(return_data)
 

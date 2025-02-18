@@ -72,4 +72,6 @@ class ClosestPointNodeFunction(BaseNodeFunction):
 
                 node_input.update(self.distance)
 
-        # self.update()
+        if sender is not None:
+        
+            self.update()
