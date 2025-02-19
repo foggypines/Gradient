@@ -19,12 +19,9 @@ class ReadoutNodeFunction(BaseNodeFunction):
 
         if self.input is None:
 
-            self.input = NodeInput(self.gui_id)
+            self.input = self.add_input(node_input)
 
-        all_node_inputs[self.gui_id + node_input] = self.input
-
-        log(f'The gui id of the readout is: {self.gui_id}')
-
+        # all_node_inputs[self.gui_id + node_input] = self.input
 
     def compute(self, sender=None, app_data=None):
 

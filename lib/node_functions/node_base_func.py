@@ -1,6 +1,6 @@
 import dearpygui.dearpygui as dpg
 from ... lib.fusionAddInUtils.general_utils import log
-from ... lib.node_functions.node_input import NodeInput
+from ... lib.node_functions.node_input import NodeInput, all_node_inputs
 from .link import Link
 from ... lib.function_node_dict import function_node_dict
 from ... lib.utility import *
@@ -12,10 +12,21 @@ from nutree import Tree, IterMethod
 class BaseNodeFunction(JSONWizard):
 
     gui_id: str
-    outputs: list = field(default_factory=lambda: [])
-    links: list[Link] = field(default_factory=lambda: [])
-    uptodate: bool = field(default=True)
-    ui_pos: tuple[int, int] = field(default=(200,200))
+    inputs: list = field(default_factory = lambda: [])
+    outputs: list = field(default_factory = lambda: [])
+    links: list[Link] = field(default_factory = lambda: [])
+    uptodate: bool = field(default = True)
+    ui_pos: tuple[int, int] = field(default = (200,200))
+
+    def add_input(self, input_name: str):
+
+        node_input = NodeInput(self.gui_id)
+
+        all_node_inputs[self.gui_id + input_name] = node_input
+
+        self.inputs.append(node_input)
+
+        return node_input
 
     def compute(self, sender=None, app_data=None):
         pass
@@ -47,7 +58,7 @@ class BaseNodeFunction(JSONWizard):
                 output_obj.populate_tree(tree = tree, branch = new_branch)
 
         return tree
-    
+
     def delete(self):
         pass
 

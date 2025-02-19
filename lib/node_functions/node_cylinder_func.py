@@ -25,23 +25,23 @@ class CylinderNodeFunction(BaseNodeFunction):
 
         if self.point is None:
 
-            self.point = NodeInput(self.gui_id)
+            self.point = self.add_input(node_point_input)
 
         if self.vector is None:
             
-            self.vector = NodeInput(self.gui_id)
+            self.vector = self.add_input(node_vector_input)
 
         if self.rad is None:
 
-            self.rad = NodeInput(self.gui_id)
+            self.rad = self.add_input(node_radius_input)
 
             self.rad.parameter[0] = 1 #default to 1 to avoid zero val radius
 
-        all_node_inputs[self.gui_id + node_point_input] = self.point
+        # all_node_inputs[self.gui_id + node_point_input] = self.point
     
-        all_node_inputs[self.gui_id + node_vector_input] = self.vector
+        # all_node_inputs[self.gui_id + node_vector_input] = self.vector
         
-        all_node_inputs[self.gui_id + node_radius_input] = self.rad
+        # all_node_inputs[self.gui_id + node_radius_input] = self.rad
 
     def compute(self, sender=None, app_data=None):
 

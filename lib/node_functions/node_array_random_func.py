@@ -25,28 +25,28 @@ class ArrayRandomNodeFunction(BaseNodeFunction):
 
         if self.count is None:
 
-            self.count = NodeInput(self.gui_id)
+            self.count = self.add_input(node_count)
             self.count.parameter[0] = 1
 
         if self.min is None:
 
-            self.min = NodeInput(self.gui_id)
+            self.min = self.add_input(node_min)
             self.min.parameter[0] = 0
 
         if self.max is None:
 
-            self.max = NodeInput(self.gui_id)
+            self.max = self.add_input(node_max)
             self.max.parameter[0] = 9
 
         if self.set is None:
 
-            self.set = NodeInput(self.gui_id)
+            self.set = self.add_input(node_set)
             self.set.parameter[0] = 1
 
-        all_node_inputs[self.gui_id + node_count] = self.count
-        all_node_inputs[self.gui_id + node_min] = self.min
-        all_node_inputs[self.gui_id + node_max] = self.max
-        all_node_inputs[self.gui_id + node_set] = self.set
+        # all_node_inputs[self.gui_id + node_count] = self.count
+        # all_node_inputs[self.gui_id + node_min] = self.min
+        # all_node_inputs[self.gui_id + node_max] = self.max
+        # all_node_inputs[self.gui_id + node_set] = self.set
 
     def compute(self, sender=None, app_data=None):
 
@@ -62,13 +62,9 @@ class ArrayRandomNodeFunction(BaseNodeFunction):
 
         self.array = np.random.uniform(_min, _max, size = ((_count, _set)))
 
-        log(f"array before compacting {self.array}")
-
         if _set == 1: #this lets the value still be used as a 1D list
 
             self.array = np.random.uniform(_min, _max, _count)
-
-        log(f"Min: {_min}, Max: {_max}---Random Array node val: {self.array}")
 
         for link in self.links:
 

@@ -25,19 +25,19 @@ class ExpressionNodeFunction(BaseNodeFunction):
 
         if self.a_var is None:
 
-            self.a_var = NodeInput(self.gui_id)
+            self.a_var = self.add_input(node_a_var)
 
         if self.b_var is None:
 
-            self.b_var = NodeInput(self.gui_id)
+            self.b_var = self.add_input(node_b_var)
 
         if self.expression is None:
 
-            self.expression =  NodeInput(self.gui_id)
+            self.expression =  self.add_input(node_expression)
 
-        all_node_inputs[self.gui_id + node_a_var] = self.a_var
-        all_node_inputs[self.gui_id + node_b_var] = self.b_var
-        all_node_inputs[self.gui_id + node_expression] = self.expression
+        # all_node_inputs[self.gui_id + node_a_var] = self.a_var
+        # all_node_inputs[self.gui_id + node_b_var] = self.b_var
+        # all_node_inputs[self.gui_id + node_expression] = self.expression
 
     def compute(self, sender=None, app_data=None):
 
@@ -51,7 +51,7 @@ class ExpressionNodeFunction(BaseNodeFunction):
 
             b = self.b_var.parameter
 
-            pi = np.pi
+            pi = np.pi # for easy reference in the expression string
 
             self.result = ne.evaluate(expr)
 

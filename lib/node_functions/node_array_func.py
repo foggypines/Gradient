@@ -23,19 +23,19 @@ class ArrayNodeFunction(BaseNodeFunction):
 
         if self.count is None:
 
-            self.count = NodeInput(self.gui_id)
+            self.count = self.add_input(node_count)
 
         if self.increment is None:
 
-            self.increment = NodeInput(self.gui_id)
+            self.increment = self.add_input(node_increment)
 
         if self.start is None:
 
-            self.start = NodeInput(self.gui_id)
+            self.start = self.add_input(node_start)
 
-        all_node_inputs[self.gui_id + node_count] = self.count
-        all_node_inputs[self.gui_id + node_increment] = self.increment
-        all_node_inputs[self.gui_id + node_start] = self.start
+        # all_node_inputs[self.gui_id + node_count] = self.count
+        # all_node_inputs[self.gui_id + node_increment] = self.increment
+        # all_node_inputs[self.gui_id + node_start] = self.start
 
     def compute(self, sender=None, app_data=None):
 

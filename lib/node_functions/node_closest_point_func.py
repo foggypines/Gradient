@@ -25,14 +25,14 @@ class ClosestPointNodeFunction(BaseNodeFunction):
 
         if self.point is None:
 
-            self.point = NodeInput(self.gui_id)
+            self.point = self.add_input(point_name)
 
         if self.point_set is None:
 
-            self.point_set = NodeInput(self.gui_id)
+            self.point_set = self.add_input(point_set_name)
 
-        all_node_inputs[self.gui_id + point_name] = self.point
-        all_node_inputs[self.gui_id + point_set_name] = self.point_set
+        # all_node_inputs[self.gui_id + point_name] = self.point
+        # all_node_inputs[self.gui_id + point_set_name] = self.point_set
 
     def compute(self, sender=None, app_data=None):
 

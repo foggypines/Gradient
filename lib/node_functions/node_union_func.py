@@ -1,4 +1,3 @@
-import numpy as np
 from .node_base_func import BaseNodeFunction
 from .node_input import NodeInput, all_node_inputs
 from ..utility import prepend_exclamation, append_value

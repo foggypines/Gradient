@@ -19,14 +19,14 @@ class DeleteIndexNodeFunction(BaseNodeFunction):
 
         if self.set is None:
 
-            self.set = NodeInput(self.gui_id)
+            self.set = self.add_input(set_name)
 
         if self.indices is None:
 
-            self.indices = NodeInput(self.gui_id)
+            self.indices = self.add_input(indices_name)
 
-        all_node_inputs[self.gui_id + set_name] = self.set
-        all_node_inputs[self.gui_id + indices_name] = self.indices
+        # all_node_inputs[self.gui_id + set_name] = self.set
+        # all_node_inputs[self.gui_id + indices_name] = self.indices
 
     def compute(self, sender=None, app_data=None):
 

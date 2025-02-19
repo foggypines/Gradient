@@ -43,23 +43,11 @@ class PointNodeFunction(BaseNodeFunction, JSONWizard):
 
     def compute(self, sender=None, app_data=None):
 
-        log('beginning compute for point funct')
-
-        log(f"x parameter length {len(self.x.parameter)}")
-        log(f"y parameter length {len(self.y.parameter)}")
-        log(f"z parameter length {len(self.z.parameter)}")
-
         num_points = len(self.x.parameter) * len(self.y.parameter) * len(self.z.parameter)
 
         self.points = np.zeros((num_points, 3), np.float64)
 
         i = 0
-
-        log("starting the point calculation")
-
-        log(f"x input: {self.x.parameter}")
-        log(f"y input: {self.y.parameter}")
-        log(f"z input: {self.z.parameter}")
 
         for x in self.x.parameter:
             for y in self.y.parameter:
@@ -70,30 +58,16 @@ class PointNodeFunction(BaseNodeFunction, JSONWizard):
                     z = self.parameter_update(self.z, node_z_input, z)
 
                     self.points[i] = np.array([x,y,z], np.float64)
-                    
-                    log(f"Points value: ({self.points})")
-                    
+                                        
                     i = i + 1
 
-        output_len = len(self.outputs)
-
-        link_len = len(self.links)
-
-        log(f"{output_len} outputs for point node")
-        log(f"{link_len} links for point node ")
-
         for link in self.links:
-
-            log(f'link stop: {link.end}')
 
             node_input = all_node_inputs[link.end]
 
             node_input.update(self.points)
 
-        log(f"all point links updated")
-
         if sender is not None:
-
             self.update()
 
     def sync_ui(self):

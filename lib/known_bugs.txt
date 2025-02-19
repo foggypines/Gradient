@@ -1,5 +1,3 @@
--When using multiple inputs into point (and likely others) the last updated input gets priority which can cause outputs to change
--similar to above the nodes do not have a wait mechanism and so nodes some nodes can become out of date waiting for there inputs to "catch up"
+-When using multiple inputs into point (and likely others) the last updated input gets priority which can cause outputs to change (Maybe fixed but further testing needed)
 -load state only "works" on a clear canvas, a clear state function is needed
--Expression may need a new string node intput type to handle expression.
--Deleting a node does not always delete it's geometry
+-Deleting a node does not always delete it's geometry (Mostly fixed but needs work on union)

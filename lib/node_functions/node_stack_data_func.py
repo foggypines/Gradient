@@ -21,19 +21,19 @@ class StackDataNodeFunction(BaseNodeFunction):
 
         if self.node_a_data is None:
 
-            self.node_a_data = NodeInput(self.gui_id)
+            self.node_a_data = self.add_input(node_a_data)
 
         if self.node_b_data is None:
 
-            self.node_b_data = NodeInput(self.gui_id)
+            self.node_b_data = self.add_input(node_b_data)
 
         if self.stack_type is None:
 
-            self.stack_type = NodeInput(self.gui_id)
+            self.stack_type = self.add_input(node_stack_type_name)
 
-        all_node_inputs[self.gui_id + node_a_data] = self.node_a_data
-        all_node_inputs[self.gui_id + node_b_data] = self.node_b_data
-        all_node_inputs[self.gui_id + node_stack_type_name] = self.stack_type
+        # all_node_inputs[self.gui_id + node_a_data] = self.node_a_data
+        # all_node_inputs[self.gui_id + node_b_data] = self.node_b_data
+        # all_node_inputs[self.gui_id + node_stack_type_name] = self.stack_type
 
     def compute(self, sender=None, app_data=None):
 
