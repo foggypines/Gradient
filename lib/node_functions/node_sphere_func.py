@@ -32,12 +32,9 @@ class SphereNodeFunction(BaseNodeFunction):
 
         if self.rad is None:
             
-            self.rad = self.add_input(node_rad_input)
+            self.rad = self.add_input(node_rad_input, ui_element=True)
 
             self.rad.parameter[0] = 1
-
-        # all_node_inputs[self.gui_id + node_point_input] = self.point
-        # all_node_inputs[self.gui_id + node_rad_input] = self.rad
 
     def compute(self, sender=None, app_data=None):
 
@@ -66,7 +63,7 @@ class SphereNodeFunction(BaseNodeFunction):
 
         if sender is not None:
 
-            self.update()
+            self.broadcast_changes()
 
     def delete(self):
 

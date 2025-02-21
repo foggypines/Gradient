@@ -37,4 +37,4 @@ class ReadoutNodeFunction(BaseNodeFunction):
 
         if sender is not None:
 
-            self.update()
+            self.broadcast_changes()

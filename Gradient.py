@@ -19,7 +19,7 @@ from .lib.fusion_functions.fusion_handler import FusionHandler
 from .lib.fusion_functions.fusion_sphere import Sphere_event_id, sphere_event, SphereEventHandler
 from .lib.fusion_functions.fusion_cylinder import cylinder_event_id, cylinder_event, CylinderEventHandler
 from .lib.fusion_functions.fusion_union import union_event_id, union_event, UnionEventHandler
-
+from .lib.fusionAddInUtils.general_utils import log
 
 import dearpygui.dearpygui as dpg
 from .lib.node_editor import NodeEditor
@@ -114,12 +114,11 @@ def run(context):
         myThread = MyThread(stopFlag, on_sphere_event, on_cylinder_event, on_union_event)
         myThread.start()
 
-        ui.messageBox("thread started")
+        log("Gradient Started")
 
     except:
         if ui:
             ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
-
 
 def stop(context):
     try:
@@ -127,7 +126,7 @@ def stop(context):
             sphere_event.remove(handlers[0])
         stopFlag.set() 
         app.unregisterCustomEvent(Sphere_event_id)
-        ui.messageBox('Stop addin')
+        log("Gradient Stopped")
     except:
         if ui:
             ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))

@@ -32,7 +32,7 @@ def add_node_gui(input_node = None):
                                 label = "Expression",
                                 width = 150,
                                 default_value = input_node.expression.parameter,
-                                callback = input_node.compute)
+                                callback = input_node.update)
             
             dpg.add_spacer(tag = input_node.gui_id + "_space1",
                 width=150)

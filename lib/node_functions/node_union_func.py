@@ -38,6 +38,10 @@ class UnionNodeFunction(BaseNodeFunction):
 
             node_input.update(self.gui_id)
 
+        if sender is not None:
+
+            self.broadcast_changes()
+
     def delete(self):
 
         union_bodies(self.node_a_input.parameter[0], self.node_b_input.parameter[0], self.gui_id, delete = True)

@@ -23,15 +23,15 @@ class ArrayNodeFunction(BaseNodeFunction):
 
         if self.count is None:
 
-            self.count = self.add_input(node_count)
+            self.count = self.add_input(node_count, ui_element=True)
 
         if self.increment is None:
 
-            self.increment = self.add_input(node_increment)
+            self.increment = self.add_input(node_increment, ui_element=True)
 
         if self.start is None:
 
-            self.start = self.add_input(node_start)
+            self.start = self.add_input(node_start, ui_element=True)
 
     def compute(self, sender=None, app_data=None):
 
@@ -61,4 +61,4 @@ class ArrayNodeFunction(BaseNodeFunction):
 
         if sender is not None: #Detect an update triggered from the UI.
 
-            self.update()
+            self.broadcast_changes()

@@ -23,4 +23,4 @@ class InputFloatNodeFunction(BaseNodeFunction):
 
             node_input.update(self.value)
 
-        self.update()
+        self.broadcast_changes()

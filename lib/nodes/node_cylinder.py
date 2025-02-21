@@ -37,7 +37,7 @@ def add_node_gui(input_node = None):
 
         node_template.add_input_float_gui_id(name = node_radius_input,
                                              input_label = "Radius",
-                                             _callback = input_node.compute,
+                                             _callback = input_node.update,
                                              gui_id = input_node.gui_id,
                                              default_val = input_node.rad.parameter[0])
         

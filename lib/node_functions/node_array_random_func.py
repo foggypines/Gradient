@@ -25,48 +25,48 @@ class ArrayRandomNodeFunction(BaseNodeFunction):
 
         if self.count is None:
 
-            self.count = self.add_input(node_count)
+            self.count = self.add_input(node_count, ui_element=True)
             self.count.parameter[0] = 1
 
         if self.min is None:
 
-            self.min = self.add_input(node_min)
+            self.min = self.add_input(node_min, ui_element=True)
             self.min.parameter[0] = 0
 
         if self.max is None:
 
-            self.max = self.add_input(node_max)
+            self.max = self.add_input(node_max, ui_element=True)
             self.max.parameter[0] = 9
 
         if self.set is None:
 
-            self.set = self.add_input(node_set)
+            self.set = self.add_input(node_set, ui_element=True)
             self.set.parameter[0] = 1
 
     def compute(self, sender=None, app_data=None):
 
-        _count = self.count.parameter[0]
-        _min = self.min.parameter[0]
-        _max = self.max.parameter[0]
-        _set = self.set.parameter[0]
+            _count = self.count.parameter[0]
+            _min = self.min.parameter[0]
+            _max = self.max.parameter[0]
+            _set = self.set.parameter[0]
 
-        _count = self.parameter_update(self.count, node_count, _count)
-        _min = self.parameter_update(self.min, node_min, _min)
-        _max = self.parameter_update(self.max, node_max, _max)
-        _set = self.parameter_update(self.set, node_set, _set)
+            _count = self.parameter_update(self.count, node_count, _count)
+            _min = self.parameter_update(self.min, node_min, _min)
+            _max = self.parameter_update(self.max, node_max, _max)
+            _set = self.parameter_update(self.set, node_set, _set)
 
-        self.array = np.random.uniform(_min, _max, size = ((_count, _set)))
+            self.array = np.random.uniform(_min, _max, size = ((_count, _set)))
 
-        if _set == 1: #this lets the value still be used as a 1D list
+            if _set == 1: #this lets the value still be used as a 1D list
 
-            self.array = np.random.uniform(_min, _max, _count)
+                self.array = np.random.uniform(_min, _max, _count)
 
-        for link in self.links:
+            for link in self.links:
 
-            node_input = all_node_inputs[link.end]
+                node_input = all_node_inputs[link.end]
 
-            node_input.update(self.array)
+                node_input.update(self.array)
 
-        if sender is not None: #Detect an update triggered from the UI.
+            if sender is not None: #Detect an update triggered from the UI.
 
-            self.update()
+                self.broadcast_changes()

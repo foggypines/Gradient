@@ -29,7 +29,7 @@ class StackDataNodeFunction(BaseNodeFunction):
 
         if self.stack_type is None:
 
-            self.stack_type = self.add_input(node_stack_type_name)
+            self.stack_type = self.add_input(node_stack_type_name, ui_element=True)
 
     def compute(self, sender=None, app_data=None):
 
@@ -57,4 +57,4 @@ class StackDataNodeFunction(BaseNodeFunction):
 
         if sender is not None:
         
-            self.update()
+            self.broadcast_changes()

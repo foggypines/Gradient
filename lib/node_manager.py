@@ -36,10 +36,6 @@ def func_chain_update(sender, app_data):
 
     if type(data) == tuple:
 
-        log(f'Sender: {sender} is type: {type(sender)}')
-
-        log(f'input: {data[0]}, output: {data[1]}')
-
         dpg.add_node_link(data[0], data[1], parent=sender)
 
         LinkList.append(data)
@@ -52,17 +48,12 @@ def func_chain_update(sender, app_data):
 
         node_input = all_node_inputs[output_alias_full]
 
-        log('now here')
-
         output_alias = dpg.get_item_alias(app_data[1])
 
-        log(f"link output alias {output_alias_full}")
 
         node_input.linked = True
 
         start.links.append(Link(start=input_alias_full, end=output_alias_full))
-
-        log(f"link added, {len(start.links)} links in start node")
 
         try:
 
@@ -72,9 +63,9 @@ def func_chain_update(sender, app_data):
 
             pass
 
-        log("compute started")
+        log("update started")
 
-        start.compute(sender = sender)
+        start.update(sender = sender)
 
         log(f"link finished")
 
@@ -134,15 +125,17 @@ def func_link_destroyed(sender, data):
 
     link.parameter = [0] #reinitialize as a zero value object but maybe we ought to change this at some point
 
-    start.links = [link for link in start.links if link.end != output_full_alias]
+    start.links = [link for link in start.links if link.end != output_full_alias] #remove the links being deleted
 
     try:
 
-        next.compute(sender = sender)
+        log("trying to update")
+
+        next.update(sender = sender)
 
     except:
 
-        log("failed compute continueing")
+        log("failed update continueing")
 
     # Enable target slot
 
@@ -162,8 +155,6 @@ def func_link_destroyed(sender, data):
 
     # Delete link
     dpg.delete_item(data)
-
-    log("link destroyed")
 
 def save_state(sender, app_data):
     
@@ -202,7 +193,7 @@ def load_state_relink(link, sender):
 
             except:
 
-                log('caught disable error')
+                log('caught disable error node input error')
 
 def load_state(sender, app_data):
 

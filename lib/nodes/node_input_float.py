@@ -37,4 +37,4 @@ def add_node_gui(input_node = None):
                                 label="Float value",
                                 width=150,
                                 default_value=input_node.value,
-                                callback=input_node.compute)
+                                callback=input_node.update)

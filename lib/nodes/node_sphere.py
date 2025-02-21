@@ -39,7 +39,7 @@ class node_sphere(NodeTemplate):
 
             self.add_input_float_gui_id(name = node_rad_input,
                                 input_label = "Radius",
-                                _callback = input_node.compute,
+                                _callback = input_node.update,
                                 gui_id = input_node.gui_id,
                                 default_val = input_node.rad.parameter[0])
             

@@ -25,15 +25,15 @@ class ExpressionNodeFunction(BaseNodeFunction):
 
         if self.a_var is None:
 
-            self.a_var = self.add_input(node_a_var)
+            self.a_var = self.add_input(node_a_var, required=False)
 
         if self.b_var is None:
 
-            self.b_var = self.add_input(node_b_var)
+            self.b_var = self.add_input(node_b_var, required=False)
 
         if self.expression is None:
 
-            self.expression =  self.add_input(node_expression)
+            self.expression =  self.add_input(node_expression, ui_element=True)
 
     def compute(self, sender=None, app_data=None):
 
@@ -67,4 +67,4 @@ class ExpressionNodeFunction(BaseNodeFunction):
 
             if sender is not None:
 
-                self.update()
+                self.broadcast_changes()

@@ -37,7 +37,7 @@ def add_node_gui(input_node = None):
         with dpg.node_attribute(tag = input_node.gui_id + indices_name):
             node_template.add_input_int_gui_id(name = indices_name,
                                                input_label = "Indices",
-                                               _callback = input_node.compute,
+                                               _callback = input_node.update,
                                                gui_id = input_node.gui_id,
                                                default_val = input_node.indices.parameter[0])
             

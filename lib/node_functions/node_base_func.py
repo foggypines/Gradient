@@ -18,9 +18,9 @@ class BaseNodeFunction(JSONWizard):
     uptodate: bool = field(default = True)
     ui_pos: tuple[int, int] = field(default = (200,200))
 
-    def add_input(self, input_name: str, ui_element: bool = False):
+    def add_input(self, input_name: str, ui_element: bool = False, required: bool = True):
 
-        node_input = NodeInput(gui_id=self.gui_id, ui_element=ui_element)
+        node_input = NodeInput(gui_id=self.gui_id, ui_element=ui_element, required=required)
 
         all_node_inputs[self.gui_id + input_name] = node_input
 
@@ -36,28 +36,33 @@ class BaseNodeFunction(JSONWizard):
 
         for input in self.inputs:
 
-            if input.linked == False and input.ui_element == False:
+            if input.linked == False and input.ui_element == False and input.required == True:
 
                 inputs_linked = False
 
         return inputs_linked
 
+    def update(self, sender=None, app_data=None):
+        
+        if self.inputs_linked():
+
+            self.compute(sender = sender)
+
+    #For each concrete node this method is inherited and is used to data processing.
     def compute(self, sender=None, app_data=None):
         pass
 
-    def update(self):
+    def broadcast_changes(self):
 
         tree = Tree("chain")
 
         self.populate_tree(tree = tree, branch = tree)
 
-        tree.print()
-
         for output in tree.iterator(method = IterMethod.LEVEL_ORDER):
 
             output_obj = function_node_dict[output.data]
 
-            output_obj.compute()
+            output_obj.update()
 
     def populate_tree(self, tree: Tree, branch: Tree):
 

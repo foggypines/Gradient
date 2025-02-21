@@ -26,15 +26,15 @@ class PointNodeFunction(BaseNodeFunction, JSONWizard):
 
         if self.x == None:
 
-            self.x = self.add_input(node_x_input)
+            self.x = self.add_input(node_x_input, ui_element=True)
 
         if self.y == None:
 
-            self.y = self.add_input(node_y_input)
+            self.y = self.add_input(node_y_input, ui_element=True)
 
         if self.z == None:
 
-            self.z = self.add_input(node_z_input)
+            self.z = self.add_input(node_z_input, ui_element=True)
 
     def compute(self, sender=None, app_data=None):
 
@@ -63,7 +63,8 @@ class PointNodeFunction(BaseNodeFunction, JSONWizard):
             node_input.update(self.points)
 
         if sender is not None:
-            self.update()
+            
+            self.broadcast_changes()
 
     def sync_ui(self):
     

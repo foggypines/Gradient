@@ -41,7 +41,7 @@ def add_node_gui(input_node = None):
                                readonly = True,
                                width = 300,
                                height = 275,
-                               callback = input_node.compute)
+                               callback = input_node.update)
             
         with dpg.node_attribute(tag = input_node.gui_id + node_output,
             attribute_type=dpg.mvNode_Attr_Output):

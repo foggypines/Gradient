@@ -14,6 +14,9 @@ class NodeInput():
     #indicates if the node input has a control element that can be used in place of a link to another node
     ui_element: bool = False 
 
+    #indicates if the node input is a required input to it's parent node
+    required: bool = True
+
     def __post__init__(self):
 
         self.update(self.parameter)

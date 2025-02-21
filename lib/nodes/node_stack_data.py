@@ -43,7 +43,7 @@ def add_node_gui(input_node = None):
             
         node_template.add_input_int_gui_id(name = node_stack_type_name,
                                            input_label = "Stack Type",
-                                           _callback = input_node.compute,
+                                           _callback = input_node.update,
                                            gui_id = input_node.gui_id,
                                            default_val = input_node.stack_type.parameter[0])
 

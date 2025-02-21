@@ -37,31 +37,31 @@ def add_node_gui(input_node = None):
             dpg.add_button(tag = input_node.gui_id + "_recalc"+ "_value",
                                 label="Recalculate",
                                 width=150,
-                                callback=input_node.compute)
+                                callback=input_node.update)
             
             dpg.add_spacer(tag = input_node.gui_id + "__value",
                 width=150)
 
         node_template.add_input_float_gui_id(name = node_min,
                                              input_label = "Minimum",
-                                             _callback = input_node.compute,
+                                             _callback = input_node.update,
                                              gui_id = input_node.gui_id,
                                              default_val = input_node.min.parameter[0])
         
         node_template.add_input_float_gui_id(name = node_max,
                                              input_label = "Maximum",
-                                             _callback = input_node.compute,
+                                             _callback = input_node.update,
                                              gui_id = input_node.gui_id,
                                              default_val = input_node.max.parameter[0])
         
         node_template.add_input_int_gui_id(name = node_count,
                                            input_label = "Count",
-                                           _callback = input_node.compute,
+                                           _callback = input_node.update,
                                            gui_id = input_node.gui_id,
                                            default_val = input_node.count.parameter[0])
         
         node_template.add_input_int_gui_id(name = node_set,
                                             input_label = "Set Count",
-                                            _callback = input_node.compute,
+                                            _callback = input_node.update,
                                             gui_id = input_node.gui_id,
                                             default_val = input_node.set.parameter[0])

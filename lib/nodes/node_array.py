@@ -32,18 +32,18 @@ def add_node_gui(input_node = None):
 
         node_template.add_input_float_gui_id(name = node_increment,
                                             input_label = "Increment",
-                                            _callback = input_node.compute,
+                                            _callback = input_node.update,
                                             gui_id = input_node.gui_id,
                                             default_val = input_node.increment.parameter[0])
 
         node_template.add_input_int_gui_id(name = node_count,
                                            input_label = "Count",
-                                           _callback = input_node.compute,
+                                           _callback = input_node.update,
                                            gui_id = input_node.gui_id,
                                            default_val = input_node.count.parameter[0])
         
         node_template.add_input_float_gui_id(name = node_start,
                                             input_label = "Start",
-                                            _callback = input_node.compute,
+                                            _callback = input_node.update,
                                             gui_id = input_node.gui_id,
                                             default_val = input_node.start.parameter[0])

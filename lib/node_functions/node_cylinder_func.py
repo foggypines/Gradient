@@ -33,7 +33,7 @@ class CylinderNodeFunction(BaseNodeFunction):
 
         if self.rad is None:
 
-            self.rad = self.add_input(node_radius_input)
+            self.rad = self.add_input(node_radius_input, ui_element=True)
 
             self.rad.parameter[0] = 1 #default to 1 to avoid zero val radius
 
@@ -66,3 +66,13 @@ class CylinderNodeFunction(BaseNodeFunction):
             log("Point and vector input mismatch cylinder not computed!")
 
         make_cylinder([0,0,0], [0,0,0], 0, self.gui_id, True)
+
+        for link in self.links:
+
+            node_input = all_node_inputs[link.end]
+
+            node_input.update(self.points)
+
+        if sender is not None:
+
+            self.broadcast_changes()
