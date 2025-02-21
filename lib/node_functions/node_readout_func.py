@@ -21,8 +21,6 @@ class ReadoutNodeFunction(BaseNodeFunction):
 
             self.input = self.add_input(node_input)
 
-        # all_node_inputs[self.gui_id + node_input] = self.input
-
     def compute(self, sender=None, app_data=None):
 
         rounded = np.round(self.input.parameter, decimals = 4)

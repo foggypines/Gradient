@@ -25,9 +25,6 @@ class DeleteIndexNodeFunction(BaseNodeFunction):
 
             self.indices = self.add_input(indices_name)
 
-        # all_node_inputs[self.gui_id + set_name] = self.set
-        # all_node_inputs[self.gui_id + indices_name] = self.indices
-
     def compute(self, sender=None, app_data=None):
 
         self.result = np.delete(self.set.parameter, self.indices.parameter)

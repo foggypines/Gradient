@@ -10,24 +10,20 @@ class NodeInput():
     gui_id: str
     parameter: np.float64 = field(default_factory=lambda: np.array([0], np.float64))
     linked: bool = False
+    
+    #indicates if the node input has a control element that can be used in place of a link to another node
+    ui_element: bool = False 
 
     def __post__init__(self):
-
-        log(f'parameter val: {self.parameter}')
 
         self.update(self.parameter)
 
     def update(self, parameter):
 
-        log(f'input parameter is:       {parameter}')
-
         if isinstance(parameter, list) or isinstance(parameter, np.ndarray):  
 
-            log('recognized as array')
-
             self.parameter = parameter
-        else:
 
-            log('recognized as singular')
+        else:
 
             self.parameter = [parameter]

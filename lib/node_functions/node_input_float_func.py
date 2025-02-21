@@ -17,18 +17,10 @@ class InputFloatNodeFunction(BaseNodeFunction):
 
         self.value = dpg.get_value(append_value(self.gui_id + node_output))
 
-        log(f"input node val: {self.value}")
-
-        log(f'Linke length: {len(self.links)}')
-
         for link in self.links:
-
-            log(f'link loop with {link}')
 
             node_input = all_node_inputs[link.end]
 
             node_input.update(self.value)
-
-            log(f'node input updated')
 
         self.update()

@@ -41,23 +41,13 @@ class SphereNodeFunction(BaseNodeFunction):
 
     def compute(self, sender=None, app_data=None):
 
-        log('begin sphere compute')
-
         i = 0
-
-        log(f"Sphere point input:     ({self.point.parameter})")
-        log(f"Spher Radius input:     ({self.rad.parameter})")
 
         for point in self.point.parameter:
 
             rad = self.rad.parameter[i]
 
             rad = self.parameter_update(self.rad, node_rad_input, rad)
-
-            log('Sphere value: ')
-            
-            log(f"  position: ({point[0]},{point[1]},{point[2]}")
-            log(f"  radius: {rad}")
 
             make_sphere(point[0],point[1],point[2], rad, self.gui_id)
 

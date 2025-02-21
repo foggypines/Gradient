@@ -22,14 +22,11 @@ class UnionNodeFunction(BaseNodeFunction):
 
         if self.node_a_input is None:
 
-            self.node_a_input = NodeInput(self.gui_id)
+            self.node_a_input = self.add_input(input_name=node_a_input)
 
         if self.node_b_input is None:
             
-            self.node_b_input = NodeInput(self.gui_id)
-
-        all_node_inputs[self.gui_id + node_a_input] = self.node_a_input
-        all_node_inputs[self.gui_id + node_b_input] = self.node_b_input
+            self.node_b_input = self.add_input(input_name=node_b_input)
 
     def compute(self, sender=None, app_data=None):
 

@@ -26,20 +26,15 @@ class PointNodeFunction(BaseNodeFunction, JSONWizard):
 
         if self.x == None:
 
-            self.x = NodeInput(self.gui_id)
+            self.x = self.add_input(node_x_input)
 
         if self.y == None:
 
-            self.y = NodeInput(self.gui_id)
+            self.y = self.add_input(node_y_input)
 
         if self.z == None:
 
-            self.z = NodeInput(self.gui_id)
-
-        all_node_inputs[self.gui_id + node_x_input] = self.x
-        all_node_inputs[self.gui_id + node_y_input] = self.y
-        all_node_inputs[self.gui_id + node_z_input] = self.z
-
+            self.z = self.add_input(node_z_input)
 
     def compute(self, sender=None, app_data=None):
 

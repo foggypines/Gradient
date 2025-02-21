@@ -33,10 +33,6 @@ class ArrayNodeFunction(BaseNodeFunction):
 
             self.start = self.add_input(node_start)
 
-        # all_node_inputs[self.gui_id + node_count] = self.count
-        # all_node_inputs[self.gui_id + node_increment] = self.increment
-        # all_node_inputs[self.gui_id + node_start] = self.start
-
     def compute(self, sender=None, app_data=None):
 
         _count = self.count.parameter[0]
@@ -49,10 +45,6 @@ class ArrayNodeFunction(BaseNodeFunction):
 
         _count = int(_count)
 
-        log(f'Count: {_count}')
-        log(f'incrment: {_increment}')
-        log(f'start: {_start}')
-
         if _increment == 0:
 
             self.array = np.linspace(start = _start, stop = _start, num = _count)
@@ -60,8 +52,6 @@ class ArrayNodeFunction(BaseNodeFunction):
         else:
 
             self.array = np.linspace(start = _start, stop = _start + _count * _increment - 1, num = _count)
-
-        log(f"Output Array: {self.array}")
 
         for link in self.links:
 

@@ -35,10 +35,6 @@ class ExpressionNodeFunction(BaseNodeFunction):
 
             self.expression =  self.add_input(node_expression)
 
-        # all_node_inputs[self.gui_id + node_a_var] = self.a_var
-        # all_node_inputs[self.gui_id + node_b_var] = self.b_var
-        # all_node_inputs[self.gui_id + node_expression] = self.expression
-
     def compute(self, sender=None, app_data=None):
 
         expr = dpg.get_value(append_value(self.gui_id + node_expression))

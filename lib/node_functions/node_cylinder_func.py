@@ -37,52 +37,23 @@ class CylinderNodeFunction(BaseNodeFunction):
 
             self.rad.parameter[0] = 1 #default to 1 to avoid zero val radius
 
-        # all_node_inputs[self.gui_id + node_point_input] = self.point
-    
-        # all_node_inputs[self.gui_id + node_vector_input] = self.vector
-        
-        # all_node_inputs[self.gui_id + node_radius_input] = self.rad
-
     def compute(self, sender=None, app_data=None):
-
-        log('begin Cylinder compute')
 
         i = 0
 
-        log(f"Point len {len(self.point.parameter)}")
-        log(f"Vector len {len(self.vector.parameter)}")
-
         if len(self.point.parameter) == len(self.vector.parameter):
-
-            log("parameter length passed")
             
             j = 0
 
             for i in range(0, len(self.point.parameter)):
 
-                log("made it here")
-
                 point = self.point.parameter[i]
-
-                log("got point")
 
                 vector = self.vector.parameter[i]
 
-                log("got vector")
-
                 rad = self.rad.parameter[j]
 
-                log("got radius part 1")
-
                 rad = self.parameter_update(self.rad, node_radius_input, rad)
-
-                log("got parameters")
-
-                log('Cylinder value: ')
-                
-                log(f"  position: ({point[0]},{point[1]},{point[2]})")
-                log(f"  vector:   ({vector[0]},{vector[1]},{vector[2]})")
-                log(f"  radius:   {rad}")
 
                 make_cylinder(point, vector, rad, self.gui_id)
 
@@ -93,6 +64,5 @@ class CylinderNodeFunction(BaseNodeFunction):
         else: 
 
             log("Point and vector input mismatch cylinder not computed!")
-
 
         make_cylinder([0,0,0], [0,0,0], 0, self.gui_id, True)

@@ -31,10 +31,6 @@ class StackDataNodeFunction(BaseNodeFunction):
 
             self.stack_type = self.add_input(node_stack_type_name)
 
-        # all_node_inputs[self.gui_id + node_a_data] = self.node_a_data
-        # all_node_inputs[self.gui_id + node_b_data] = self.node_b_data
-        # all_node_inputs[self.gui_id + node_stack_type_name] = self.stack_type
-
     def compute(self, sender=None, app_data=None):
 
         stack_type = self.parameter_update(input = self.stack_type,

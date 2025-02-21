@@ -18,15 +18,29 @@ class BaseNodeFunction(JSONWizard):
     uptodate: bool = field(default = True)
     ui_pos: tuple[int, int] = field(default = (200,200))
 
-    def add_input(self, input_name: str):
+    def add_input(self, input_name: str, ui_element: bool = False):
 
-        node_input = NodeInput(self.gui_id)
+        node_input = NodeInput(gui_id=self.gui_id, ui_element=ui_element)
 
         all_node_inputs[self.gui_id + input_name] = node_input
 
         self.inputs.append(node_input)
 
         return node_input
+    
+    #Validates if all required inputs are linked.
+    #This is the default base where all none ui elements are checked
+    def inputs_linked(self):
+
+        inputs_linked = True
+
+        for input in self.inputs:
+
+            if input.linked == False and input.ui_element == False:
+
+                inputs_linked = False
+
+        return inputs_linked
 
     def compute(self, sender=None, app_data=None):
         pass
