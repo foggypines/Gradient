@@ -6,7 +6,6 @@ from ... lib.fusionAddInUtils.general_utils import log
 from dataclasses import dataclass, field
 
 node_name = "NodeArrayInput"
-node_output = "_Output"
 node_count = "_Count"
 node_increment = "_Increment"
 node_start = "_Start"
@@ -21,6 +20,8 @@ class ArrayNodeFunction(BaseNodeFunction):
 
     def __post_init__(self):
 
+        super().__post_init__()
+
         if self.count is None:
 
             self.count = self.add_input(node_count, ui_element=True)
@@ -32,6 +33,8 @@ class ArrayNodeFunction(BaseNodeFunction):
         if self.start is None:
 
             self.start = self.add_input(node_start, ui_element=True)
+
+        self.inputs.extend([self.count, self.increment, self.start])
 
     def compute(self, sender=None, app_data=None):
 
@@ -53,12 +56,14 @@ class ArrayNodeFunction(BaseNodeFunction):
 
             self.array = np.linspace(start = _start, stop = _start + _count * _increment - 1, num = _count)
 
-        for link in self.links:
+        self.output.payload = self.array
 
-            node_input = all_node_inputs[link.end]
+        # for link in self.links:
 
-            node_input.update(self.array)
+        #     node_input = all_node_inputs[link.end]
 
-        if sender is not None: #Detect an update triggered from the UI.
+        #     node_input.update(self.array)
 
-            self.broadcast_changes()
+        # if sender is not None: #Detect an update triggered from the UI.
+
+        #     self.broadcast_changes()

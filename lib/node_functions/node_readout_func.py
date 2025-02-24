@@ -17,6 +17,8 @@ class ReadoutNodeFunction(BaseNodeFunction):
 
     def __post_init__(self):
 
+        super().__post_init__()
+
         if self.input is None:
 
             self.input = self.add_input(node_input)
@@ -29,12 +31,14 @@ class ReadoutNodeFunction(BaseNodeFunction):
 
         dpg.set_value(append_value(self.gui_id + "_Input"), print_out)
 
-        for link in self.links:
+        self.output.payload = self.input.parameter
 
-            node_input = all_node_inputs[link.end]
+        # for link in self.links:
 
-            node_input.update(self.input.parameter) #pass the parameter through
+        #     node_input = all_node_inputs[link.end]
 
-        if sender is not None:
+        #     node_input.update(self.input.parameter) #pass the parameter through
 
-            self.broadcast_changes()
+        # if sender is not None:
+
+        #     self.broadcast_changes()

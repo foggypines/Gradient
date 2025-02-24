@@ -17,6 +17,8 @@ class DeleteIndexNodeFunction(BaseNodeFunction):
 
     def __post_init__(self):
 
+        super().__post_init__()
+
         if self.set is None:
 
             self.set = self.add_input(set_name)
@@ -29,12 +31,14 @@ class DeleteIndexNodeFunction(BaseNodeFunction):
 
         self.result = np.delete(self.set.parameter, self.indices.parameter)
 
-        for link in self.links:
+        self.output.payload = self.result
 
-            node_input = all_node_inputs[link.end]
+        # for link in self.links:
 
-            node_input.update(self.result)
+        #     node_input = all_node_inputs[link.end]
 
-        if sender is not None: 
+        #     node_input.update(self.result)
+
+        # if sender is not None: 
             
-            self.broadcast_changes()
+        #     self.broadcast_changes()

@@ -19,6 +19,8 @@ class StackDataNodeFunction(BaseNodeFunction):
 
     def __post_init__(self):
 
+        super().__post_init__()
+
         if self.node_a_data is None:
 
             self.node_a_data = self.add_input(node_a_data)
@@ -49,12 +51,14 @@ class StackDataNodeFunction(BaseNodeFunction):
             
             self.result = np.column_stack((self.node_a_data.parameter, self.node_b_data.parameter))
 
-        for link in self.links:
+        self.output.payload = self.result
 
-            node_input = all_node_inputs[link.end]
+        # for link in self.links:
 
-            node_input.update(self.result)
+        #     node_input = all_node_inputs[link.end]
 
-        if sender is not None:
+        #     node_input.update(self.result)
+
+        # if sender is not None:
         
-            self.broadcast_changes()
+        #     self.broadcast_changes()

@@ -1,7 +1,7 @@
 import dearpygui.dearpygui as dpg
 from . node_template import NodeTemplate
 from ... lib.function_node_dict import function_node_dict
-from ... lib.node_functions.node_cylinder_func import CylinderNodeFunction, node_name, node_point_input, node_vector_input, node_radius_input, node_output
+from ... lib.node_functions.node_cylinder_func import CylinderNodeFunction, node_name, node_point_input, node_vector_input, node_radius_input
 from ... lib.fusionAddInUtils.general_utils import log
 
 def add_node_cylinder(app_data, user_data):

@@ -1,6 +1,6 @@
 from .node_base_func import BaseNodeFunction
 from .node_input import NodeInput, all_node_inputs
-from ..utility import prepend_exclamation, append_value
+from ..utility import prepend_exclamation
 from dataclasses import dataclass, field
 
 node_type = prepend_exclamation("Union")
@@ -20,6 +20,8 @@ class UnionNodeFunction(BaseNodeFunction):
 
     def __post_init__(self):
 
+        super().__post_init__()
+
         if self.node_a_input is None:
 
             self.node_a_input = self.add_input(input_name=node_a_input)
@@ -32,15 +34,17 @@ class UnionNodeFunction(BaseNodeFunction):
 
         union_bodies(self.node_a_input.parameter[0], self.node_b_input.parameter[0], self.gui_id)
 
-        for link in self.links:
+        self.output.payload = self.gui_id
 
-            node_input = all_node_inputs[link.end]
+        # for link in self.links:
 
-            node_input.update(self.gui_id)
+        #     node_input = all_node_inputs[link.end]
 
-        if sender is not None:
+        #     node_input.update(self.gui_id)
 
-            self.broadcast_changes()
+        # if sender is not None:
+
+        #     self.broadcast_changes()
 
     def delete(self):
 

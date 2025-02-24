@@ -26,6 +26,8 @@ class SphereNodeFunction(BaseNodeFunction):
 
     def __post_init__(self):
 
+        super().__post_init__()
+
         if self.point is None:
 
             self.point = self.add_input(node_point_input)
@@ -55,15 +57,17 @@ class SphereNodeFunction(BaseNodeFunction):
 
         make_sphere(0,0,0, 0, self.gui_id, compute = True)
 
-        for link in self.links:
+        self.output.payload = self.gui_id
 
-            node_input = all_node_inputs[link.end]
+        # for link in self.links:
 
-            node_input.update(self.gui_id)
+        #     node_input = all_node_inputs[link.end]
 
-        if sender is not None:
+        #     node_input.update(self.gui_id)
 
-            self.broadcast_changes()
+        # if sender is not None:
+
+        #     self.broadcast_changes()
 
     def delete(self):
 

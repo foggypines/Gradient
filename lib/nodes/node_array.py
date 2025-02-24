@@ -2,6 +2,7 @@ import dearpygui.dearpygui as dpg
 from .node_template import NodeTemplate
 from ... lib.function_node_dict import function_node_dict
 from ... lib.node_functions.node_array_func import *
+from ... lib.node_functions.node_base_func import node_output
 
 def add_node_input_array(app_data, user_data):
 

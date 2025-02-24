@@ -1,33 +1,49 @@
 import dearpygui.dearpygui as dpg
 from ... lib.fusionAddInUtils.general_utils import log
 from ... lib.node_functions.node_input import NodeInput, all_node_inputs
+from ... lib.node_functions.node_output import NodeOutput, all_node_outputs
 from .link import Link
 from ... lib.function_node_dict import function_node_dict
 from ... lib.utility import *
 from dataclasses import dataclass, field
-from dataclass_wizard import JSONWizard
+from dataclass_wizard import JSONWizard, json_field
 from nutree import Tree, IterMethod
+
+node_output = "_Output"
 
 @dataclass(kw_only=True)
 class BaseNodeFunction(JSONWizard):
 
     gui_id: str
-    inputs: list = field(default_factory = lambda: [])
-    outputs: list = field(default_factory = lambda: [])
-    links: list[Link] = field(default_factory = lambda: [])
+    inputs: list[NodeInput] = field(repr=False, default_factory = lambda: [])
+    output: NodeOutput = field(default = None)
+    outputs: list[NodeOutput] = field(repr=False, default_factory = lambda: [])
     uptodate: bool = field(default = True)
     ui_pos: tuple[int, int] = field(default = (200,200))
 
+    def __post_init__(self):
+
+        if self.output is None:
+
+            self.output = self.add_output(node_output)
+
+        self.outputs.append(self.output)
+
     def add_input(self, input_name: str, ui_element: bool = False, required: bool = True):
 
-        node_input = NodeInput(gui_id=self.gui_id, ui_element=ui_element, required=required)
-
-        all_node_inputs[self.gui_id + input_name] = node_input
-
-        self.inputs.append(node_input)
+        node_input = NodeInput(gui_id=self.gui_id,
+                               full_id=self.gui_id + input_name,
+                                ui_element=ui_element,
+                                  required=required)
 
         return node_input
     
+    def add_output(self, output_name: str):
+        
+        node_output = NodeOutput(gui_id = self.gui_id, full_id = self.gui_id + output_name)
+
+        return node_output
+
     #Validates if all required inputs are linked.
     #This is the default base where all none ui elements are checked
     def inputs_linked(self):
@@ -48,15 +64,33 @@ class BaseNodeFunction(JSONWizard):
 
             self.compute(sender = sender)
 
+            self.set_broadcasts()
+
+            if sender is not None: #only need to run the broadcast method for the first node
+
+                self.broadcast_changes()
+
     #For each concrete node this method is inherited and is used to data processing.
     def compute(self, sender=None, app_data=None):
         pass
+
+    def set_broadcasts(self):
+
+        for output in self.outputs:
+
+            for link in output.links:
+
+                node_input = all_node_inputs[link]
+
+                node_input.update(output.payload)
 
     def broadcast_changes(self):
 
         tree = Tree("chain")
 
         self.populate_tree(tree = tree, branch = tree)
+
+        tree.print()
 
         for output in tree.iterator(method = IterMethod.LEVEL_ORDER):
 
@@ -68,20 +102,27 @@ class BaseNodeFunction(JSONWizard):
 
         for output in self.outputs:
 
-            if tree.find(output) is None:
+            for node_input_alias in output.links:
 
-                new_branch = branch.add(output)
+                node = simplify_alias(node_input_alias)
 
-                output_obj = function_node_dict[output]
+                if tree.find(node) is None:
+                # if tree.find(output) is None:
 
-                output_obj.populate_tree(tree = tree, branch = new_branch)
+                    # new_branch = branch.add(node)
+
+                    new_branch = branch.add(node)
+
+                    output_obj = function_node_dict[node]
+
+                    output_obj.populate_tree(tree = tree, branch = new_branch)
 
         return tree
 
     def delete(self):
         pass
 
-    def parameter_update(self, input, input_name, val):
+    def parameter_update(self, input: NodeInput, input_name: str, val):
         
         if input.linked == True:
 
@@ -113,7 +154,7 @@ class BaseNodeFunction(JSONWizard):
 
             node_input.parameter = dpg.get_value(append_value(self.gui_id + node_input))
 
-    def set_ui(self, input, input_name):
+    def set_ui(self, input: NodeInput, input_name: str):
         
         if len(input.parameter) == 1:
 

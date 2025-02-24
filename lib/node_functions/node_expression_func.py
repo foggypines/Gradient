@@ -23,6 +23,8 @@ class ExpressionNodeFunction(BaseNodeFunction):
 
     def __post_init__(self):
 
+        super().__post_init__()
+
         if self.a_var is None:
 
             self.a_var = self.add_input(node_a_var, required=False)
@@ -55,16 +57,18 @@ class ExpressionNodeFunction(BaseNodeFunction):
 
                 self.result = self.result.item()
 
-            log(f'Result: {self.result}')
+            self.output.payload = self.result
 
-            for link in self.links:
+            # log(f'Result: {self.result}')
 
-                log(f'link start: {link.start}')
+            # for link in self.links:
 
-                node_input = all_node_inputs[link.end]
+            #     log(f'link start: {link.start}')
 
-                node_input.update(self.result)
+            #     node_input = all_node_inputs[link.end]
 
-            if sender is not None:
+            #     node_input.update(self.result)
 
-                self.broadcast_changes()
+            # if sender is not None:
+
+            #     self.broadcast_changes()

@@ -3,12 +3,13 @@ from scipy.spatial import KDTree
 import dearpygui.dearpygui as dpg
 from . node_base_func import BaseNodeFunction
 from .node_input import NodeInput, all_node_inputs
+from .node_output import NodeOutput
 from ... lib.utility import append_value
 from ... lib.fusionAddInUtils.general_utils import log
 from dataclasses import dataclass, field
 
 node_name = "ClosestPoint"
-node_output_closest = "_OutputClosest"
+# node_output_closest = "_OutputClosest"
 node_output_distance = "_OutputDist"
 point_name = "_Point"
 point_set_name = "_Point_set"
@@ -20,8 +21,11 @@ class ClosestPointNodeFunction(BaseNodeFunction):
     point_set: NodeInput = field(default = None)
     closest_point: np.float64 = field(default_factory = lambda: np.zeros((1,3), np.float64))
     distance: np.float64 = field(default_factory = lambda: np.zeros((1,1), np.float64))
+    distance_output: NodeOutput = field(default = None)
 
     def __post_init__(self):
+
+        super().__post_init__()
 
         if self.point is None:
 
@@ -30,6 +34,12 @@ class ClosestPointNodeFunction(BaseNodeFunction):
         if self.point_set is None:
 
             self.point_set = self.add_input(point_set_name)
+
+        if self.distance_output is None:
+
+            self.distance_output = self.add_output(node_output_distance)
+
+        self.inputs.extend([self.point, self.point_set, self.distance_output])
 
     def compute(self, sender=None, app_data=None):
 
@@ -57,18 +67,22 @@ class ClosestPointNodeFunction(BaseNodeFunction):
 
             self.distance = self.distance[0]
 
-        for link in self.links:
+        self.output.payload = self.closest_point
 
-            node_input = all_node_inputs[link.end]
+        self.distance_output.payload = self.distance
 
-            if node_output_closest in link.start:
+        # for link in self.links:
 
-                node_input.update(self.closest_point)
+        #     node_input = all_node_inputs[link.end]
 
-            if node_output_distance in link.start:
+        #     if node_output_closest in link.start:
 
-                node_input.update(self.distance)
+        #         node_input.update(self.closest_point)
 
-        if sender is not None:
+        #     if node_output_distance in link.start:
+
+        #         node_input.update(self.distance)
+
+        # if sender is not None:
         
-            self.broadcast_changes()
+        #     self.broadcast_changes()

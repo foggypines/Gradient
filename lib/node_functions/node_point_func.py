@@ -24,6 +24,8 @@ class PointNodeFunction(BaseNodeFunction, JSONWizard):
 
     def __post_init__(self):
 
+        super().__post_init__()
+
         if self.x == None:
 
             self.x = self.add_input(node_x_input, ui_element=True)
@@ -56,15 +58,17 @@ class PointNodeFunction(BaseNodeFunction, JSONWizard):
                                         
                     i = i + 1
 
-        for link in self.links:
+        self.output.payload = self.points
 
-            node_input = all_node_inputs[link.end]
+        # for link in self.links:
 
-            node_input.update(self.points)
+        #     node_input = all_node_inputs[link.end]
 
-        if sender is not None:
+        #     node_input.update(self.points)
+
+        # if sender is not None:
             
-            self.broadcast_changes()
+        #     self.broadcast_changes()
 
     def sync_ui(self):
     

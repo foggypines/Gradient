@@ -5,7 +5,6 @@ from ... lib.fusionAddInUtils.general_utils import log
 import numpy as np
 from dataclasses import dataclass, field
 
-node_output = "_Output"
 node_count = "_Count"
 node_min = "_Min"
 node_max = "_Max"
@@ -22,6 +21,8 @@ class ArrayRandomNodeFunction(BaseNodeFunction):
     array: np.float64 = field(default_factory = lambda: np.zeros((1,1), np.float64))
 
     def __post_init__(self):
+
+        super().__post_init__()
 
         if self.count is None:
 
@@ -43,6 +44,8 @@ class ArrayRandomNodeFunction(BaseNodeFunction):
             self.set = self.add_input(node_set, ui_element=True)
             self.set.parameter[0] = 1
 
+        self.inputs.extend([self.count, self.min, self.max, self.set])
+
     def compute(self, sender=None, app_data=None):
 
             _count = self.count.parameter[0]
@@ -61,12 +64,14 @@ class ArrayRandomNodeFunction(BaseNodeFunction):
 
                 self.array = np.random.uniform(_min, _max, _count)
 
-            for link in self.links:
+            self.output.payload = self.array
 
-                node_input = all_node_inputs[link.end]
+            # for link in self.links:
 
-                node_input.update(self.array)
+            #     node_input = all_node_inputs[link.end]
 
-            if sender is not None: #Detect an update triggered from the UI.
+            #     node_input.update(self.array)
 
-                self.broadcast_changes()
+            # if sender is not None: #Detect an update triggered from the UI.
+
+            #     self.broadcast_changes()

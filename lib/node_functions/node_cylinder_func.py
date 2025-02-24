@@ -10,7 +10,6 @@ node_type = prepend_exclamation(node_name)
 node_point_input ="_input_point"
 node_vector_input = "_input_vector"
 node_radius_input = "_input_radius"
-node_output = "_Output"
 
 make_cylinder = None
 
@@ -22,6 +21,8 @@ class CylinderNodeFunction(BaseNodeFunction):
     rad: NodeInput = field(default_factory=lambda: None)
 
     def __post_init__(self):
+
+        super().__post_init__()
 
         if self.point is None:
 
@@ -61,18 +62,21 @@ class CylinderNodeFunction(BaseNodeFunction):
                     j = 0
                 else:
                     j = j + 1
+
+            make_cylinder([0,0,0], [0,0,0], 0, self.gui_id, True)
+
         else: 
 
             log("Point and vector input mismatch cylinder not computed!")
 
-        make_cylinder([0,0,0], [0,0,0], 0, self.gui_id, True)
+        self.output.payload = self.gui_id
 
-        for link in self.links:
+        # for link in self.links:
 
-            node_input = all_node_inputs[link.end]
+        #     node_input = all_node_inputs[link.end]
 
-            node_input.update(self.points)
+        #     node_input.update(self.points)
 
-        if sender is not None:
+        # if sender is not None:
 
-            self.broadcast_changes()
+        #     self.broadcast_changes()
