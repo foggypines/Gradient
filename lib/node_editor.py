@@ -93,6 +93,10 @@ class NodeEditor:
                 with dpg.menu(label="Primitive Geometry"):
                     node_point.node_point_instance.add_menu_item()
 
+                    dpg.add_menu_item(tag = "Menu_vector",
+                                      label = "Vector",
+                                      callback = node_vector.add_node_vector)
+
                 with dpg.menu(label = "Evaluate"):
                     dpg.add_menu_item(tag = "Menu_AddNode_CloestPoint",
                                       label = "Closest Point",

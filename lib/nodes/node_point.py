@@ -34,9 +34,9 @@ class node_point(NodeTemplate):
                       parent="NodeEditor",
                       label=self.label,
                       pos=_pos):
-            self.add_input_float_(node_x_input, "X value", point_node_func.update)
-            self.add_input_float_(node_y_input, "Y value", point_node_func.update)
-            self.add_input_float_(node_z_input, "Z value", point_node_func.update)
+            self.add_input_float_(node_x_input, "X", point_node_func.update)
+            self.add_input_float_(node_y_input, "Y", point_node_func.update)
+            self.add_input_float_(node_z_input, "Z", point_node_func.update)
             with dpg.node_attribute(tag=str(self.random_id) + self.node_type + "_Output", attribute_type=dpg.mvNode_Attr_Output):
                 dpg.add_spacer(tag=str(self.random_id) + self.node_type + "_value",
                                 width=150)
@@ -62,21 +62,21 @@ def add_from_func(input_func: PointNodeFunction):
             dpg.add_input_float(tag=input_func.gui_id + node_x_input + "_value",
                                 label="X value",
                                 width=150,
-                                default_value=0,
+                                default_value=input_func.x.parameter[0],
                                 callback=input_func.update)
         
         with dpg.node_attribute(tag=input_func.gui_id + node_y_input):
             dpg.add_input_float(tag=input_func.gui_id + node_y_input + "_value",
                         label="Y value",
                         width=150,
-                        default_value=0,
+                        default_value=input_func.y.parameter[0],
                         callback=input_func.update)
             
         with dpg.node_attribute(tag=input_func.gui_id + node_z_input):
             dpg.add_input_float(tag=input_func.gui_id + node_z_input + "_value",
                                 label="Z value",
                                 width=150,
-                                default_value=0,
+                                default_value=input_func.z.parameter[0],
                                 callback=input_func.update)
 
         with dpg.node_attribute(tag=input_func.gui_id + "_Output", attribute_type=dpg.mvNode_Attr_Output):

@@ -53,19 +53,24 @@ class MyThread(threading.Thread):
         def callback_show_debugger(sender, data):
             dpg.show_debug()
 
+        # with dpg.font_registry():
+
+        #     font1 = dpg.add_font('C:/Users/Dylan Rice/AppData/Roaming/Autodesk/Autodesk Fusion 360/API/AddIns/Gradient/assets/fonts/Nasalization Rg.otf', 13)
+
         with dpg.viewport_menu_bar():
             dpg.add_menu_item(label="Debugger", callback=callback_show_debugger)
             dpg.add_menu_item(label="Close", callback=callback_close_program)
-            #dpg.bind_font(default_font)
 
-            node_sphere_func.make_sphere = self.on_sphere_event.make_sphere
-            node_cylinder_func.make_cylinder = self.on_cylinder_event.make_cylinder
-            node_union_func.union_bodies = self.on_union_event.union_bodies
+            # dpg.bind_font(font1)
 
             nodeEditor = NodeEditor()
 
         # Setup API connections
         # node_point_func.point_instance.setup(make_point)
+
+        node_sphere_func.make_sphere = self.on_sphere_event.make_sphere
+        node_cylinder_func.make_cylinder = self.on_cylinder_event.make_cylinder
+        node_union_func.union_bodies = self.on_union_event.union_bodies
 
         # Main GUI Loop
         dpg.setup_dearpygui()

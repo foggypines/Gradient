@@ -16,12 +16,18 @@ class NodeInput(JSONWizard):
     #indicates if the node input has a control element that can be used in place of a link to another node
     ui_element: bool = False 
 
+    ui_label: str = str()
+
     #indicates if the node input is a required input to it's parent node
     required: bool = True
 
     def __post_init__(self):
 
         all_node_inputs[self.full_id] = self
+
+        if self.ui_label != str():
+
+            self.ui_label = self.ui_label.replace('input', '').replace('output', '').replace('_', '').capitalize()
 
         self.update(self.parameter)
 

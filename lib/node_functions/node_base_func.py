@@ -2,7 +2,6 @@ import dearpygui.dearpygui as dpg
 from ... lib.fusionAddInUtils.general_utils import log
 from ... lib.node_functions.node_input import NodeInput, all_node_inputs
 from ... lib.node_functions.node_output import NodeOutput, all_node_outputs
-from .link import Link
 from ... lib.function_node_dict import function_node_dict
 from ... lib.utility import *
 from dataclasses import dataclass, field
@@ -29,12 +28,15 @@ class BaseNodeFunction(JSONWizard):
 
         self.outputs.append(self.output)
 
-    def add_input(self, input_name: str, ui_element: bool = False, required: bool = True):
+    def add_input(self, input_name: str, ui_element: bool = False, required: bool = True, ui_label = str()):
 
         node_input = NodeInput(gui_id=self.gui_id,
-                               full_id=self.gui_id + input_name,
-                                ui_element=ui_element,
-                                  required=required)
+                            full_id=self.gui_id + input_name,
+                            ui_element=ui_element,
+                            required=required,
+                            ui_label=ui_label)
+        
+        self.inputs.append(node_input)
 
         return node_input
     
@@ -107,9 +109,6 @@ class BaseNodeFunction(JSONWizard):
                 node = simplify_alias(node_input_alias)
 
                 if tree.find(node) is None:
-                # if tree.find(output) is None:
-
-                    # new_branch = branch.add(node)
 
                     new_branch = branch.add(node)
 
@@ -167,6 +166,3 @@ class BaseNodeFunction(JSONWizard):
     def update_ui_pos(self):
 
         self.ui_pos= dpg.get_item_pos(self.gui_id)
-
-    def sync_ui(self):
-        pass

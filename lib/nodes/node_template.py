@@ -1,6 +1,7 @@
 import random
 import dearpygui.dearpygui as dpg
-from ...lib.fusionAddInUtils.general_utils import log
+from ..node_functions.node_input import NodeInput
+from ..node_functions.node_output import NodeOutput
 
 class NodeTemplate:
 
@@ -20,6 +21,14 @@ class NodeTemplate:
         self.random_id = random.randint(0, 50000)
         while dpg.does_item_exist(str(self.random_id) + self.node_type):
             self.random_id = random.randint(0, 50000)
+
+    def add_from_node_input(self, node_input: NodeInput, _callback):
+        with dpg.node_attribute(tag = node_input.full_id):
+            dpg.add_input_float(tag = node_input.full_id + "_value",
+                                label = node_input.ui_label,
+                                width = 150,
+                                default_value = node_input.parameter[0],
+                                callback = _callback)
             
     def add_input_float_(self, name, input_label, _callback, default_val = 0):
         with dpg.node_attribute(tag=str(self.random_id) + self.node_type + name):
@@ -52,6 +61,13 @@ class NodeTemplate:
                                 width = 150,
                                 default_value = default_val,
                                 callback = _callback)
+
+    def add_from_node_output(self, node_output: NodeOutput):
+        with dpg.node_attribute(tag = node_output.full_id,
+                attribute_type=dpg.mvNode_Attr_Output):
+
+            dpg.add_spacer(tag = node_output.full_id + "__space0",
+                width=150)
 
     def add_out_float(self, name, input_label):
         with dpg.node_attribute(tag=str(self.random_id) + self.node_type + name, attribute_type=dpg.mvNode_Attr_Output):

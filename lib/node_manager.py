@@ -5,7 +5,6 @@ import dearpygui.dearpygui as dpg
 from .. lib.fusionAddInUtils.general_utils import log
 from .. lib.node_functions.node_input import all_node_inputs
 from .. lib.node_functions.node_output import NodeOutput, all_node_outputs
-from .. lib.node_functions.link import Link
 from .. lib.function_node_dict import function_node_dict
 from .node_dict_static import node_dict_static
 from .utility import *
