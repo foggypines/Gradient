@@ -24,11 +24,17 @@ class NodeTemplate:
 
     def add_from_node_input(self, node_input: NodeInput, _callback):
         with dpg.node_attribute(tag = node_input.full_id):
-            dpg.add_input_float(tag = node_input.full_id + "_value",
-                                label = node_input.ui_label,
-                                width = 150,
-                                default_value = node_input.parameter[0],
-                                callback = _callback)
+
+            if node_input.ui_element == True:
+
+                dpg.add_input_float(tag = node_input.full_id + "_value",
+                                    label = node_input.ui_label,
+                                    width = 150,
+                                    default_value = node_input.parameter[0],
+                                    callback = _callback)
+                
+            else:
+                dpg.add_text(default_value= node_input.ui_label, indent=150)
             
     def add_input_float_(self, name, input_label, _callback, default_val = 0):
         with dpg.node_attribute(tag=str(self.random_id) + self.node_type + name):

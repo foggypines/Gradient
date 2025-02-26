@@ -113,6 +113,10 @@ class NodeEditor:
                                       label="Union",
                                       callback=node_union.add_node_union_data,
                                       user_data="Union")
+                    dpg.add_menu_item(tag = "Menu_AddNode_Transform",
+                                      label = "BReP Transform",
+                                      callback = node_transform.add_node_transform,
+                                      user_data = "BReP Transform")
 
             with dpg.group(horizontal=True):
                 dpg.add_text("Status:")

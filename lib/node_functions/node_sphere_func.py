@@ -59,16 +59,6 @@ class SphereNodeFunction(BaseNodeFunction):
 
         self.output.payload = self.gui_id
 
-        # for link in self.links:
-
-        #     node_input = all_node_inputs[link.end]
-
-        #     node_input.update(self.gui_id)
-
-        # if sender is not None:
-
-        #     self.broadcast_changes()
-
     def delete(self):
 
         make_sphere(0,0,0, 0, self.gui_id, compute = True, delete = True)

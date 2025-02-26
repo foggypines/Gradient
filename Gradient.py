@@ -19,6 +19,7 @@ from .lib.fusion_functions.fusion_handler import FusionHandler
 from .lib.fusion_functions.fusion_sphere import Sphere_event_id, sphere_event, SphereEventHandler
 from .lib.fusion_functions.fusion_cylinder import cylinder_event_id, cylinder_event, CylinderEventHandler
 from .lib.fusion_functions.fusion_union import union_event_id, union_event, UnionEventHandler
+from .lib.fusion_functions.fusion_transform import transform_event_id, transform_event, TransformEventHandler
 from .lib.fusionAddInUtils.general_utils import log
 
 import dearpygui.dearpygui as dpg
@@ -26,6 +27,7 @@ from .lib.node_editor import NodeEditor
 from .lib.node_functions import node_sphere_func
 from .lib.node_functions import node_cylinder_func
 from .lib.node_functions import node_union_func
+from .lib.node_functions import node_transform_func
 
 app = None
 ui = adsk.core.UserInterface.cast(None)
@@ -34,13 +36,14 @@ stopFlag = None
 
 # The class for the new thread.
 class MyThread(threading.Thread):
-    def __init__(self, event, on_sphere_event, on_cylinder_event, on_union_event):
+    def __init__(self, event, on_sphere_event, on_cylinder_event, on_union_event, on_transform_event):
         threading.Thread.__init__(self)
         self.stopped = event
 
         self.on_sphere_event = on_sphere_event
         self.on_cylinder_event = on_cylinder_event
         self.on_union_event = on_union_event
+        self.on_transform_event = on_transform_event
 
     def run(self):
 
@@ -71,6 +74,7 @@ class MyThread(threading.Thread):
         node_sphere_func.make_sphere = self.on_sphere_event.make_sphere
         node_cylinder_func.make_cylinder = self.on_cylinder_event.make_cylinder
         node_union_func.union_bodies = self.on_union_event.union_bodies
+        node_transform_func.transform_bodies = self.on_transform_event.transform_bodies
 
         # Main GUI Loop
         dpg.setup_dearpygui()
@@ -113,10 +117,18 @@ def run(context):
         union_event.add(on_union_event)
         handlers.append(on_union_event)
 
-        # Create a new thread for the other processing.        
+        # Register the transform bodies custom event and connect the handler
+
+        global transform_event
+        transform_event = app.registerCustomEvent(transform_event_id)
+        on_transform_event = TransformEventHandler(app, ui, fusion_handler.design, fusion_handler.base_feature)
+        transform_event.add(on_transform_event)
+        handlers.append(on_transform_event)
+
+        # Create a new thread for the node processing.        
         global stopFlag        
         stopFlag = threading.Event()
-        myThread = MyThread(stopFlag, on_sphere_event, on_cylinder_event, on_union_event)
+        myThread = MyThread(stopFlag, on_sphere_event, on_cylinder_event, on_union_event, on_transform_event=on_transform_event)
         myThread.start()
 
         log("Gradient Started")
