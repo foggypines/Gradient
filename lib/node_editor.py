@@ -2,17 +2,21 @@
 # Licensed under the MIT-License
 
 import dearpygui.dearpygui as dpg
-from . node_manager import func_chain_update, func_link_destroyed, node_destroyed, LinkList, save_state, load_state
+from . node_manager import *
 from . nodes import *
 from . node_position import LastNodePosition
+import tkinter as tk
+from tkinter import filedialog
 
 # Destroy window if closed
 def callback_close_window(sender):
+    
     dpg.delete_item(sender)
 
 
 # Delete selected items
 def callback_delete_item(sender):
+    
     for selected_node in dpg.get_selected_nodes("NodeEditor"):
         # Deleting node and attached links
         ## Extract all children of the deleted node
@@ -24,12 +28,7 @@ def callback_delete_item(sender):
             if dpg.get_item_configuration(link)["attr_1"] in selected_node_children or dpg.get_item_configuration(link)["attr_2"] in selected_node_children:
                 #dpg.delete_item(link)
                 func_link_destroyed("NodeEditor", link)
-        ## Iterate trough LinkList and remove attached links
-        for item in LinkList:
-            for sub_item in item:
-                if dpg.get_item_alias(selected_node) in sub_item:
-                    LinkList.remove(item) 
-
+        
         # Deleting node
 
         node_destroyed(dpg.get_item_alias(selected_node))
@@ -39,14 +38,39 @@ def callback_delete_item(sender):
     for selected_link in dpg.get_selected_links("NodeEditor"):
         func_link_destroyed("NodeEditor", selected_link)
 
+def save_node_file(sender, app_data):
+    '''Save the current state of the node editor to a file'''
+
+    root = tk.Tk()
+
+    root.withdraw()  # Hide the root window
+
+    file_path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
+
+    if file_path:
+
+        save_state(file_path)
+
+def load_node_file(sender, app_data):
+    '''Load a save state from a file'''
+
+    root = tk.Tk()
+
+    root.withdraw()  # Hide the root window
+
+    file_path = filedialog.askopenfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
+
+    if file_path:
+
+        load_state(file_path)
 
 class NodeEditor:
     def __init__(self):
 
-        dpg.add_button(label="Save state",
-                       callback=save_state)
-        dpg.add_button(label="Load state",
-                       callback=load_state)
+        dpg.add_button(label="Save As",
+                       callback=save_node_file)
+        dpg.add_button(label="Load",
+                       callback=load_node_file)
 
         with dpg.window(tag="NodeEditorWindow",
                         label="Node editor",

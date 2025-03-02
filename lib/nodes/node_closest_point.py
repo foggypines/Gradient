@@ -1,6 +1,7 @@
 import dearpygui.dearpygui as dpg
 from . node_template import NodeTemplate
-from ...lib.function_node_dict import function_node_dict
+from ... lib.node_functions.node_base_func import node_output
+from ... lib.function_node_dict import function_node_dict
 from ... lib.node_functions.node_closest_point_func import *
 from ... lib.fusionAddInUtils.general_utils import log
 
@@ -40,8 +41,12 @@ def add_node_gui(input_node = None):
             
             dpg.add_spacer(tag = input_node.gui_id + "_space1",
                 width=150)
+
+        # for node_output in input_node.outputs: 
             
-        with dpg.node_attribute(tag = input_node.gui_id + node_output_closest,
+        #     node_template.add_from_node_output(node_output=node_output)
+            
+        with dpg.node_attribute(tag = input_node.gui_id + node_output,
                         attribute_type=dpg.mvNode_Attr_Output):
             dpg.add_text(default_value = "Closest", indent = 100)
                

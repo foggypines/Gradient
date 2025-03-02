@@ -8,9 +8,6 @@ from ... lib.enums import *
 node_name = "Sphere"
 node_type = prepend_exclamation(node_name)
 
-node_x_input = "_input_x"
-node_y_input = "_input_y"
-node_z_input = "_input_z"
 node_point_input = "_input_point"
 node_rad_input ="_input_radius"
 

@@ -54,16 +54,8 @@ class ArrayNodeFunction(BaseNodeFunction):
             
         else:
 
-            self.array = np.linspace(start = _start, stop = _start + _count * _increment - 1, num = _count)
+            # self.array = np.linspace(start = _start, stop = _start + _count * _increment - 1, num = _count)
+
+            self.array = np.arange(start = _start, stop = _start + _count * _increment - 1, step = _increment)
 
         self.output.payload = self.array
-
-        # for link in self.links:
-
-        #     node_input = all_node_inputs[link.end]
-
-        #     node_input.update(self.array)
-
-        # if sender is not None: #Detect an update triggered from the UI.
-
-        #     self.broadcast_changes()

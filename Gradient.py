@@ -58,7 +58,7 @@ class MyThread(threading.Thread):
 
         # with dpg.font_registry():
 
-        #     font1 = dpg.add_font('C:/Users/Dylan Rice/AppData/Roaming/Autodesk/Autodesk Fusion 360/API/AddIns/Gradient/assets/fonts/Nasalization Rg.otf', 13)
+        #     font1 = dpg.add_font('AppData/Roaming/Autodesk/Autodesk Fusion 360/API/AddIns/Gradient/assets/fonts/Nasalization Rg.otf', 13)
 
         with dpg.viewport_menu_bar():
             dpg.add_menu_item(label="Debugger", callback=callback_show_debugger)

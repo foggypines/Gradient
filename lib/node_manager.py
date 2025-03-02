@@ -11,8 +11,6 @@ from .utility import *
 import json
 import orjson
 
-LinkList = []
-
 # Function for updating all interconnected nodes if a link was created or a value has changed
 def func_chain_update(sender, app_data):
     # sender = "NodeEditor" for links
@@ -36,8 +34,6 @@ def func_chain_update(sender, app_data):
     if type(data) == tuple:
 
         dpg.add_node_link(data[0], data[1], parent=sender)
-
-        LinkList.append(data)
 
         start = function_node_dict[output_alias]
 
@@ -111,19 +107,11 @@ def func_link_destroyed(sender, data):
     
     input_alias = simplify_alias(input_full_alias)
 
-    # output_alias = simplify_alias(output_full_alias)
-
     next = function_node_dict[input_alias]
 
     output = all_node_outputs[output_full_alias]
 
     output.links.remove(input_full_alias)
-
-    # next = function_node_dict[output_alias]
-
-    # output = all_node_outputs[input_full_alias]
-
-    # output.links.remove(output_full_alias)
 
     #delete links to node inputs
 
@@ -155,47 +143,39 @@ def func_link_destroyed(sender, data):
 
         log("failed to reinable node")
 
-    # Removing the old connection from the LinkList
-
-    LinkList.remove((input_full_alias, output_full_alias))
-
     # Delete link
     dpg.delete_item(data)
 
-def save_state(sender, app_data):
+def save_state(file_path):
     
-    open("C:/temp/gradient.json", "w").close()
+    open(file_path, "w").close()
 
-    for n in function_node_dict.values():
+    for node_funct in function_node_dict.values():
+        
+        node_funct.update_ui_pos()
 
-        n.update_ui_pos()
-
-    with open('C:/temp/gradient.json', 'a') as json_file:
-
+    with open(file_path, 'a') as json_file:
         json_bytes = orjson.dumps(function_node_dict, option=
                                    orjson.OPT_SERIALIZE_NUMPY |
                                    orjson.OPT_APPEND_NEWLINE)
         
         #serialize to json. Use orjson to get numpy constructs saved
-
         json_intermediate = orjson.loads(json_bytes)
 
         #now remove inputs and outputs.
-
         for node_func in json_intermediate.values():
-
+            
             del node_func['inputs']
 
             del node_func['outputs']
 
         #now actually save
-
         json_bytes = orjson.dumps(json_intermediate, option=
                             orjson.OPT_SERIALIZE_NUMPY |
                             orjson.OPT_APPEND_NEWLINE)
         
         json_str = json_bytes.decode()
-
+        
         json_file.write(json_str)
 
 def load_state_relink(output: NodeOutput, sender):
@@ -207,10 +187,6 @@ def load_state_relink(output: NodeOutput, sender):
 
             dpg.add_node_link(output.full_id, link, parent = sender, tag = output.full_id + link)
 
-            LinkList.append(output.full_id)
-
-            LinkList.append(link)
-
             if dpg.does_alias_exist(link + "_value"):
 
                 try:
@@ -221,9 +197,11 @@ def load_state_relink(output: NodeOutput, sender):
 
                     log('caught disable error node input error')
 
-def load_state(sender, app_data):
+def load_state(file_path):
+    
+    clear_state() #clear any old state
 
-    with open("C:/temp/gradient.json", "r") as file:
+    with open(file_path, "r") as file:
 
         json_file = json.load(file)
 
@@ -237,8 +215,6 @@ def load_state(sender, app_data):
 
             node_group.add_from_func(node_func)
 
-            node_func.sync_ui()
-
             function_node_dict[key] = node_func
 
         _sender = "NodeEditor"
@@ -248,3 +224,35 @@ def load_state(sender, app_data):
             for output in node_func.outputs:
 
                 load_state_relink(output = output, sender = _sender)
+
+def clear_state():
+    '''Resets the gradient to it's starting state with no nodes added to the editor'''
+
+    #Clear all dictionaries for inputs/outpus and node functions
+
+    all_node_inputs.clear()
+
+    all_node_outputs.clear()
+
+    function_node_dict.clear()
+
+    #Delete all nodes  
+
+    nodes = dpg.get_item_children("NodeEditor", 1)
+
+    links = dpg.get_item_children("NodeEditor", 0)
+
+    for node in nodes:
+
+        node_links = dpg.get_item_children(node)
+
+        if node_links:
+
+            for link in node_links:
+                
+                if link in links:
+                    
+                    dpg.delete_item(link)
+
+        dpg.delete_item(node)
+

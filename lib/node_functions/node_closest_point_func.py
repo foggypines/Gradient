@@ -1,15 +1,13 @@
 import numpy as np
 from scipy.spatial import KDTree
-import dearpygui.dearpygui as dpg
+from . node_input import NodeInput
 from . node_base_func import BaseNodeFunction
-from .node_input import NodeInput, all_node_inputs
 from .node_output import NodeOutput
 from ... lib.utility import append_value
 from ... lib.fusionAddInUtils.general_utils import log
 from dataclasses import dataclass, field
 
 node_name = "ClosestPoint"
-# node_output_closest = "_OutputClosest"
 node_output_distance = "_OutputDist"
 point_name = "_Point"
 point_set_name = "_Point_set"
@@ -39,7 +37,9 @@ class ClosestPointNodeFunction(BaseNodeFunction):
 
             self.distance_output = self.add_output(node_output_distance)
 
-        self.inputs.extend([self.point, self.point_set, self.distance_output])
+        self.inputs.extend([self.point, self.point_set])
+
+        self.outputs.extend([self.distance_output])
 
     def compute(self, sender=None, app_data=None):
 
@@ -70,19 +70,3 @@ class ClosestPointNodeFunction(BaseNodeFunction):
         self.output.payload = self.closest_point
 
         self.distance_output.payload = self.distance
-
-        # for link in self.links:
-
-        #     node_input = all_node_inputs[link.end]
-
-        #     if node_output_closest in link.start:
-
-        #         node_input.update(self.closest_point)
-
-        #     if node_output_distance in link.start:
-
-        #         node_input.update(self.distance)
-
-        # if sender is not None:
-        
-        #     self.broadcast_changes()

@@ -35,6 +35,9 @@ class NodeTemplate:
                 
             else:
                 dpg.add_text(default_value= node_input.ui_label, indent=150)
+
+                dpg.add_spacer(tag = node_input.full_id + "__space0",
+                    width=150)
             
     def add_input_float_(self, name, input_label, _callback, default_val = 0):
         with dpg.node_attribute(tag=str(self.random_id) + self.node_type + name):

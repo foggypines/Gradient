@@ -1,5 +1,4 @@
 -When using multiple inputs into point (and likely others) the last updated input gets priority which can cause outputs to change (likely fixed but further testing needed)
--load state only "works" on a clear canvas, a clear state function is needed
 -Deleting a node does not always delete it's geometry (Mostly fixed but needs work on union)
 -Node union compute code needs to be updated to allow multiple input bodies to be unioned
 -Nodes that generate a BReP need a more helpful output other than the guid which is what they currently use
