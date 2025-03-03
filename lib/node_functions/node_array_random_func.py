@@ -44,8 +44,6 @@ class ArrayRandomNodeFunction(BaseNodeFunction):
             self.set = self.add_input(node_set, ui_element=True)
             self.set.parameter[0] = 1
 
-        self.inputs.extend([self.count, self.min, self.max, self.set])
-
     def compute(self, sender=None, app_data=None):
 
             _count = self.count.parameter[0]

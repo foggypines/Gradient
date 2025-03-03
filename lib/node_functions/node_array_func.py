@@ -34,8 +34,6 @@ class ArrayNodeFunction(BaseNodeFunction):
 
             self.start = self.add_input(node_start, ui_element=True)
 
-        self.inputs.extend([self.count, self.increment, self.start])
-
     def compute(self, sender=None, app_data=None):
 
         _count = self.count.parameter[0]
@@ -53,8 +51,6 @@ class ArrayNodeFunction(BaseNodeFunction):
             self.array = np.linspace(start = _start, stop = _start, num = _count)
             
         else:
-
-            # self.array = np.linspace(start = _start, stop = _start + _count * _increment - 1, num = _count)
 
             self.array = np.arange(start = _start, stop = _start + _count * _increment - 1, step = _increment)
 

@@ -108,6 +108,8 @@ class BaseNodeFunction(JSONWizard):
 
                 node = simplify_alias(node_input_alias)
 
+                
+
                 if tree.find(node) is None:
 
                     new_branch = branch.add(node)

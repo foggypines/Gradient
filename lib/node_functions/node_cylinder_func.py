@@ -1,6 +1,6 @@
 from . node_base_func import BaseNodeFunction
-from . node_input import NodeInput, all_node_inputs
-from ... lib.utility import prepend_exclamation, append_value
+from . node_input import NodeInput
+from ... lib.utility import prepend_exclamation
 from ... lib.fusionAddInUtils.general_utils import log
 from dataclasses import dataclass, field
 
@@ -70,13 +70,3 @@ class CylinderNodeFunction(BaseNodeFunction):
             log("Point and vector input mismatch cylinder not computed!")
 
         self.output.payload = self.gui_id
-
-        # for link in self.links:
-
-        #     node_input = all_node_inputs[link.end]
-
-        #     node_input.update(self.points)
-
-        # if sender is not None:
-
-        #     self.broadcast_changes()

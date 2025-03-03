@@ -52,13 +52,3 @@ class StackDataNodeFunction(BaseNodeFunction):
             self.result = np.column_stack((self.node_a_data.parameter, self.node_b_data.parameter))
 
         self.output.payload = self.result
-
-        # for link in self.links:
-
-        #     node_input = all_node_inputs[link.end]
-
-        #     node_input.update(self.result)
-
-        # if sender is not None:
-        
-        #     self.broadcast_changes()

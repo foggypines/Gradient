@@ -55,14 +55,14 @@ def load_node_file(sender, app_data):
     '''Load a save state from a file'''
 
     root = tk.Tk()
-
+    
     root.withdraw()  # Hide the root window
-
+  
     file_path = filedialog.askopenfilename(defaultextension=".json", filetypes=[("JSON files", "*.json")])
-
+  
     if file_path:
-
-        load_state(file_path)
+    
+        load_state(file_path)    
 
 class NodeEditor:
     def __init__(self):
@@ -120,6 +120,9 @@ class NodeEditor:
                     dpg.add_menu_item(tag = "Menu_vector",
                                       label = "Vector",
                                       callback = node_vector.add_node_vector)
+                    dpg.add_menu_item(tag = "Menu_AddNode_BoundingBox",
+                                      label = "Bounding Box",
+                                      callback = node_binding.add_node_bounding_box)
 
                 with dpg.menu(label = "Evaluate"):
                     dpg.add_menu_item(tag = "Menu_AddNode_CloestPoint",
@@ -141,6 +144,9 @@ class NodeEditor:
                                       label = "BReP Transform",
                                       callback = node_transform.add_node_transform,
                                       user_data = "BReP Transform")
+                    dpg.add_menu_item(tag = "Menu_AddNode_BReP_Box",
+                                      label = "BRep Box",
+                                      callback = node_binding.add_node_brep_box)
 
             with dpg.group(horizontal=True):
                 dpg.add_text("Status:")

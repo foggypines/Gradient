@@ -34,10 +34,9 @@ class NodeTemplate:
                                     callback = _callback)
                 
             else:
-                dpg.add_text(default_value= node_input.ui_label, indent=150)
+                dpg.add_text(default_value = node_input.ui_label)
 
-                dpg.add_spacer(tag = node_input.full_id + "__space0",
-                    width=150)
+                dpg.add_spacer(tag = node_input.full_id + "__space0", width = 150)
             
     def add_input_float_(self, name, input_label, _callback, default_val = 0):
         with dpg.node_attribute(tag=str(self.random_id) + self.node_type + name):
@@ -72,8 +71,7 @@ class NodeTemplate:
                                 callback = _callback)
 
     def add_from_node_output(self, node_output: NodeOutput):
-        with dpg.node_attribute(tag = node_output.full_id,
-                attribute_type=dpg.mvNode_Attr_Output):
+        with dpg.node_attribute(tag = node_output.full_id, attribute_type=dpg.mvNode_Attr_Output):
 
             dpg.add_spacer(tag = node_output.full_id + "__space0",
                 width=150)

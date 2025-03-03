@@ -2,7 +2,6 @@ import dearpygui.dearpygui as dpg
 from . node_template import NodeTemplate
 from ...lib.function_node_dict import function_node_dict
 from ... lib.node_functions.node_readout_func import *
-from ... lib.fusionAddInUtils.general_utils import log
 
 def add_node_readout(app_data, user_data):
 
@@ -22,8 +21,7 @@ def add_node_gui(input_node = None):
 
         function_node_dict[_tag] = input_node
 
-    val = """ah...., 
-    the french"""
+    val = """This is a readout node. It will display the output of the connected node."""
 
     with dpg.node(tag = input_node.gui_id,
                   parent = "NodeEditor",
