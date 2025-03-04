@@ -33,7 +33,7 @@ class BRePBoxNodeFunction(BaseNodeFunction):
 
         for bounding_box in self.bounding_box.parameter:
 
-            make_box(bounding_box, self.gui_id)
+            make_box(node_id=self.gui_id, bounding_box=bounding_box)
 
         make_box(self.gui_id, compute = True)
 
