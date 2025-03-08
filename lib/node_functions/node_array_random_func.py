@@ -46,8 +46,8 @@ class ArrayRandomNodeFunction(BaseNodeFunction):
 
     def compute(self, sender=None, app_data=None):
 
-            _count = self.count.parameter[0]
-            _min = self.min.parameter[0]
+            _count = int(self.count.parameter[0])
+            _min = int(self.min.parameter[0])
             _max = self.max.parameter[0]
             _set = self.set.parameter[0]
 
@@ -63,13 +63,3 @@ class ArrayRandomNodeFunction(BaseNodeFunction):
                 self.array = np.random.uniform(_min, _max, _count)
 
             self.output.payload = self.array
-
-            # for link in self.links:
-
-            #     node_input = all_node_inputs[link.end]
-
-            #     node_input.update(self.array)
-
-            # if sender is not None: #Detect an update triggered from the UI.
-
-            #     self.broadcast_changes()

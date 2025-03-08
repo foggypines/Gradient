@@ -52,6 +52,6 @@ class ArrayNodeFunction(BaseNodeFunction):
             
         else:
 
-            self.array = np.arange(start = _start, stop = _start + _count * _increment - 1, step = _increment)
+            self.array = np.arange(start = _start, stop = _start + _count * _increment, step = _increment)
 
         self.output.payload = self.array

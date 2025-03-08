@@ -79,10 +79,10 @@ class NodeEditor:
                         pos=[50, 50],
                         menubar=True,
                         on_close=callback_close_window):
-            pass
             
             #Add a menu bar to the window
             with dpg.menu_bar(label="MenuBar"):
+                pass
                 
                 with dpg.menu(label="Input/Output"):
                     dpg.add_menu_item(tag="Menu_AddNode_InputFloat",
@@ -154,6 +154,7 @@ class NodeEditor:
 
             # Add node editor to the window
             with dpg.node_editor(tag="NodeEditor",
+                                 
                                  # Function call for updating all nodes if a new link is created
                                  callback=func_chain_update,
                                  # Function call for updating if a link is destroyed
