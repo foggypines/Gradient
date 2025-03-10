@@ -27,7 +27,7 @@ C:\Users\user_name\AppData\Roaming\Autodesk\Autodesk Fusion 360\API\AddIns\Gradi
 After cloning the repository run the following command to install dependencies:
 
 ```
-pip install -r C:\Users\Dylan Rice\AppData\Roaming\Autodesk\Autodesk Fusion 360\API\AddIns\Gradient\modules\requirements.txt
+pip install -r C:\Users\user_name\AppData\Roaming\Autodesk\Autodesk Fusion 360\API\AddIns\Gradient\modules\requirements.txt
 ```
 
 Once dependencies are installed you can run Gradient from the Scripts and Add-Ins menu in Fusion 360.
