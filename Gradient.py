@@ -21,6 +21,7 @@ from .lib.fusion_functions.fusion_cylinder import cylinder_event_id, cylinder_ev
 from .lib.fusion_functions.fusion_union import union_event_id, union_event, UnionEventHandler
 from .lib.fusion_functions.fusion_transform import transform_event_id, transform_event, TransformEventHandler
 from .lib.fusion_functions.fusion_brep_box import brep_box_event_id, brep_box_event, BRePBoxEventHandler
+from .lib.fusion_functions.fusion_get_brep import brep_get_event_id, brep_get_event, BRePGetEventHandler
 from .lib.fusionAddInUtils.general_utils import log
 
 import dearpygui.dearpygui as dpg
@@ -30,6 +31,7 @@ from .lib.node_functions import node_cylinder_func
 from .lib.node_functions import node_union_func
 from .lib.node_functions import node_transform_func
 from .lib.node_functions import node_brep_box_func
+from .lib.node_functions import node_get_BReP_func as node_brep_func
 
 app = None
 ui = adsk.core.UserInterface.cast(None)
@@ -39,7 +41,7 @@ stopFlag = None
 # The class for the new thread.
 class MyThread(threading.Thread):
     def __init__(self, event, on_sphere_event, on_cylinder_event,
-                on_union_event, on_transform_event, on_brep_box_event):
+                on_union_event, on_transform_event, on_brep_box_event, on_brep_get_event):
         threading.Thread.__init__(self)
         self.stopped = event
 
@@ -48,6 +50,7 @@ class MyThread(threading.Thread):
         self.on_union_event = on_union_event
         self.on_transform_event = on_transform_event
         self.on_brep_box_event = on_brep_box_event
+        self.on_brep_get_event = on_brep_get_event
 
     def run(self):
 
@@ -59,10 +62,6 @@ class MyThread(threading.Thread):
 
         def callback_show_debugger(sender, data):
             dpg.show_debug()
-
-        # with dpg.font_registry():
-
-        #     font1 = dpg.add_font('AppData/Roaming/Autodesk/Autodesk Fusion 360/API/AddIns/Gradient/assets/fonts/Nasalization Rg.otf', 13)
 
         with dpg.viewport_menu_bar():
             dpg.add_menu_item(label="Debugger", callback=callback_show_debugger)
@@ -80,6 +79,7 @@ class MyThread(threading.Thread):
         node_union_func.union_bodies = self.on_union_event.union_bodies
         node_transform_func.transform_bodies = self.on_transform_event.transform_bodies
         node_brep_box_func.make_box = self.on_brep_box_event.make_box
+        node_brep_func.get_brep = self.on_brep_get_event.get_brep
 
         # Main GUI Loop
         dpg.setup_dearpygui()
@@ -130,6 +130,14 @@ def run(context):
         transform_event.add(on_transform_event)
         handlers.append(on_transform_event)
 
+        # Register the BReP get custom event and connect the handler
+
+        global brep_get_event
+        brep_get_event = app.registerCustomEvent(brep_get_event_id)
+        on_brep_get_event = BRePGetEventHandler(app, ui, fusion_handler.design, fusion_handler.base_feature)
+        brep_get_event.add(on_brep_get_event)
+        handlers.append(on_brep_get_event)
+
         #Register the BReP box custom event and connect the handler
 
         global brep_box_event
@@ -143,7 +151,8 @@ def run(context):
         stopFlag = threading.Event()
         myThread = MyThread(stopFlag, on_sphere_event, on_cylinder_event,
                             on_union_event, on_transform_event=on_transform_event,
-                            on_brep_box_event=on_brep_box_event)
+                            on_brep_box_event=on_brep_box_event,
+                            on_brep_get_event=on_brep_get_event)
         myThread.start()
 
         log("Gradient Started")

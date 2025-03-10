@@ -49,7 +49,9 @@ class TransformEventHandler(BaseEventHandler):
 
                 attributes_a = self.design.findAttributes("Node", brep_input)
 
-                body = self.design.findEntityByToken(attributes_a[0].value)[0]
+                attr = attributes_a[0]
+
+                body = attr.parent
 
                 temp_body = temp_brep_mgr.copy(body)
                 

@@ -58,17 +58,3 @@ class ExpressionNodeFunction(BaseNodeFunction):
                 self.result = self.result.item()
 
             self.output.payload = self.result
-
-            # log(f'Result: {self.result}')
-
-            # for link in self.links:
-
-            #     log(f'link start: {link.start}')
-
-            #     node_input = all_node_inputs[link.end]
-
-            #     node_input.update(self.result)
-
-            # if sender is not None:
-
-            #     self.broadcast_changes()

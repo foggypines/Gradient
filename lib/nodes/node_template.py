@@ -2,6 +2,7 @@ import random
 import dearpygui.dearpygui as dpg
 from ..node_functions.node_input import NodeInput
 from ..node_functions.node_output import NodeOutput
+from ..node_functions.node_base_func import *
 
 class NodeTemplate:
 
@@ -10,6 +11,23 @@ class NodeTemplate:
         self.label = node_name
         self.user_data = node_name
         self.node_type = "!" + node_name
+
+    def generate_gui(self, input_node: BaseNodeFunction, label: str):
+
+        with dpg.node(tag = input_node.gui_id,
+                    parent = "NodeEditor",
+                    label = label,
+                    pos = input_node.ui_pos):
+
+            for node_input in input_node.inputs:
+
+                self.add_from_node_input(node_input = node_input,
+                                                _callback = input_node.compute)
+                
+            with dpg.node_attribute(tag = input_node.output.full_id,
+                                    attribute_type = dpg.mvNode_Attr_Output):
+                dpg.add_spacer(tag = input_node.gui_id + "_value",
+                    width=150)
 
     def add_menu_item(self):
         dpg.add_menu_item(tag = self.tag,

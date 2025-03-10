@@ -1,7 +1,9 @@
-# Copyright 2021 LuminousLizard
-# Licensed under the MIT-License
+import os
 
-__all__ = ["node_input_float", "node_output_float", "node_sphere",
-            "node_point", "node_array", "node_array_random", "node_cylinder", "node_expression",
-            "node_closest_point", "node_readout", "node_stack_data", "node_delete_index",
-            "node_union", "node_vector", "node_transform", "node_binding"]
+__all__ = []
+nodes_folder = os.path.dirname(__file__)
+
+for filename in os.listdir(nodes_folder):
+    if filename.endswith(".py") and filename != "__init__.py":
+        module_name = filename[:-3]
+        __all__.append(module_name)

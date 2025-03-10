@@ -79,8 +79,8 @@ class NodeEditor:
                         pos=[50, 50],
                         menubar=True,
                         on_close=callback_close_window):
-            
-            #Add a menu bar to the window
+
+            # Add a menu bar to the window
             with dpg.menu_bar(label="MenuBar"):
                 pass
                 
@@ -105,6 +105,10 @@ class NodeEditor:
                                       label="Expression",
                                       callback=node_expression.add_node_expr,
                                       user_data="Expression")
+                    dpg.add_menu_item(tag="Menu_AddNode_CrossProduct",
+                                      label="Cross Product",
+                                      callback=node_binding.add_node_cross_product,
+                                      user_data="Cross Product")
                     
                 with dpg.menu(label = "Data Manipulation"):
                     dpg.add_menu_item(tag = "Menu_stack_data",
@@ -147,6 +151,9 @@ class NodeEditor:
                     dpg.add_menu_item(tag = "Menu_AddNode_BReP_Box",
                                       label = "BRep Box",
                                       callback = node_binding.add_node_brep_box)
+                    dpg.add_menu_item(tag = "Menu_AddNode_GetBRep",
+                                      label = "Get BRep",
+                                      callback = node_binding.add_node_get_brep)
 
             with dpg.group(horizontal=True):
                 dpg.add_text("Status:")
