@@ -117,6 +117,9 @@ class NodeEditor:
                     dpg.add_menu_item(tag = "Menu_delete_index_data",
                                       label = "Delete Index Data",
                                       callback = node_delete_index.add_node_delete_index_data)
+                    dpg.add_menu_item(tag = "Menu_get_index_data",
+                                      label = "Get Index",
+                                      callback = node_binding.add_node_get_index)
 
                 with dpg.menu(label="Primitive Geometry"):
                     node_point.node_point_instance.add_menu_item()
@@ -154,6 +157,12 @@ class NodeEditor:
                     dpg.add_menu_item(tag = "Menu_AddNode_GetBRep",
                                       label = "Get BRep",
                                       callback = node_binding.add_node_get_brep)
+                    
+                with dpg.menu(label="Algorithm"):
+                    dpg.add_menu_item(tag="Menu_AddNode_Delaunay",
+                                      label="Delaunay Triangulation",
+                                      callback=node_binding.add_node_delaunay,
+                                      user_data="Delaunay")
 
             with dpg.group(horizontal=True):
                 dpg.add_text("Status:")

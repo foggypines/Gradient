@@ -5,6 +5,8 @@ from ... lib.node_functions import node_bounding_box_func as bound_box_func
 from ... lib.node_functions import node_brep_box_func as brep_box_func
 from ... lib.node_functions import node_cross_product_func as cross_product_func
 from ... lib.node_functions import node_get_BReP_func as get_brep_func
+from ... lib.node_functions import node_delaunay_func as delaunay_func
+from ... lib.node_functions import node_get_index_func as get_index_func
 from ... lib.node_functions.node_base_func import *
 
 def add_node_bounding_box(app_data, user_data):
@@ -86,3 +88,43 @@ def add_node_get_brep_gui(input_node = None):
         function_node_dict[_tag] = input_node
 
     node_template.generate_gui(input_node = input_node, label="Get BRep")
+
+def add_node_delaunay(app_data, user_data):
+
+    add_node_delaunay_gui(input_node = None)
+
+def add_node_delaunay_gui(input_node = None):
+
+    node_template = NodeTemplate(delaunay_func.node_name)
+
+    if input_node is None:
+
+        node_template.create_rand_id()
+
+        _tag = (str(node_template.random_id) + node_template.node_type)
+
+        input_node = delaunay_func.DelaunayNodeFunction(gui_id = _tag)
+
+        function_node_dict[_tag] = input_node
+
+    node_template.generate_gui(input_node = input_node, label="Delaunay Triangulation")
+
+def add_node_get_index(app_data, user_data):
+
+    add_node_get_index_gui(input_node = None)
+
+def add_node_get_index_gui(input_node = None):
+
+    node_template = NodeTemplate(get_index_func.node_name)
+
+    if input_node is None:
+
+        node_template.create_rand_id()
+
+        _tag = (str(node_template.random_id) + node_template.node_type)
+
+        input_node = get_index_func.GetIndexNodeFunction(gui_id = _tag)
+
+        function_node_dict[_tag] = input_node
+
+    node_template.generate_gui(input_node = input_node, label="Get Index")

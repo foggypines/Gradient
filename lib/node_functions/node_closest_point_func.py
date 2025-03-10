@@ -37,10 +37,6 @@ class ClosestPointNodeFunction(BaseNodeFunction):
 
             self.distance_output = self.add_output(node_output_distance)
 
-        # self.inputs.extend([self.point, self.point_set])
-
-        # self.outputs.extend([self.distance_output])
-
     def compute(self, sender=None, app_data=None):
 
         i = 0
