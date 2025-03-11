@@ -24,10 +24,12 @@ class NodeTemplate:
                 self.add_from_node_input(node_input = node_input,
                                                 _callback = input_node.compute)
                 
-            with dpg.node_attribute(tag = input_node.output.full_id,
-                                    attribute_type = dpg.mvNode_Attr_Output):
-                dpg.add_spacer(tag = input_node.gui_id + "_value",
-                    width=150)
+            for node_output in input_node.outputs:
+
+                with dpg.node_attribute(tag = node_output.full_id,
+                                        attribute_type = dpg.mvNode_Attr_Output):
+                    dpg.add_spacer(tag = input_node.gui_id + node_output.full_id + "_space",
+                        width=150, height=25)
 
     def add_menu_item(self):
         dpg.add_menu_item(tag = self.tag,
