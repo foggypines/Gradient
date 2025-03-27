@@ -26,3 +26,9 @@ def create_rand_id(node_type):
     while dpg.does_item_exist(str(random_id) + node_type):
             
             random_id = random.randint(0, 50000)
+
+def fancy_class_name(obj):
+    name = obj.__class__.__name__
+    name = name.replace('node', '').replace('func', '')
+    name = name.replace('_', ' ').title()
+    return name

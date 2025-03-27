@@ -1,4 +1,6 @@
 import dearpygui.dearpygui as dpg
+from .. utility import fancy_class_name
+from .. node_position import LastNodePosition
 from . node_template import NodeTemplate
 from ... lib.function_node_dict import function_node_dict
 from ... lib.node_functions import node_bounding_box_func as bound_box_func
@@ -13,7 +15,7 @@ def add_node_bounding_box(app_data, user_data):
     
     add_node_bounding_box_gui(input_node = None)
 
-def add_node_bounding_box_gui(input_node = None):
+def add_node_bounding_box_gui(input_node: bound_box_func.BoundingBoxNodeFunction = None):
 
     node_template = NodeTemplate(bound_box_func.node_name)
 
@@ -23,7 +25,7 @@ def add_node_bounding_box_gui(input_node = None):
 
         _tag = (str(node_template.random_id) + node_template.node_type)
 
-        input_node = bound_box_func.BoundingBoxNodeFunction(gui_id = _tag)
+        input_node = bound_box_func.BoundingBoxNodeFunction(gui_id = _tag, ui_pos=LastNodePosition)
 
         function_node_dict[_tag] = input_node
 
@@ -43,7 +45,7 @@ def add_node_brep_box_gui(input_node = None):
 
         _tag = (str(node_template.random_id) + node_template.node_type)
 
-        input_node = brep_box_func.BRePBoxNodeFunction(gui_id = _tag)
+        input_node = brep_box_func.BRePBoxNodeFunction(gui_id = _tag, ui_pos=LastNodePosition)
 
         function_node_dict[_tag] = input_node
 
@@ -63,7 +65,7 @@ def add_node_cross_product_gui(input_node = None):
 
         _tag = (str(node_template.random_id) + node_template.node_type)
 
-        input_node = cross_product_func.CrossProductNodeFunction(gui_id = _tag)
+        input_node = cross_product_func.CrossProductNodeFunction(gui_id = _tag, ui_pos=LastNodePosition)
 
         function_node_dict[_tag] = input_node
 
@@ -83,11 +85,13 @@ def add_node_get_brep_gui(input_node = None):
 
         _tag = (str(node_template.random_id) + node_template.node_type)
 
-        input_node = get_brep_func.GetBRepNodeFunction(gui_id = _tag)
+        input_node = get_brep_func.GetBRepNodeFunction(gui_id = _tag, ui_pos=LastNodePosition)
 
         function_node_dict[_tag] = input_node
 
     node_template.generate_gui(input_node = input_node, label="Get BRep")
+
+
 
 def add_node_delaunay(app_data, user_data):
 
@@ -103,7 +107,7 @@ def add_node_delaunay_gui(input_node = None):
 
         _tag = (str(node_template.random_id) + node_template.node_type)
 
-        input_node = delaunay_func.DelaunayNodeFunction(gui_id = _tag)
+        input_node = delaunay_func.DelaunayNodeFunction(gui_id = _tag, ui_pos=LastNodePosition)
 
         function_node_dict[_tag] = input_node
 
@@ -123,7 +127,7 @@ def add_node_get_index_gui(input_node = None):
 
         _tag = (str(node_template.random_id) + node_template.node_type)
 
-        input_node = get_index_func.GetIndexNodeFunction(gui_id = _tag)
+        input_node = get_index_func.GetIndexNodeFunction(gui_id = _tag, ui_pos=LastNodePosition)
 
         function_node_dict[_tag] = input_node
 

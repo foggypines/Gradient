@@ -7,6 +7,7 @@ from . nodes import *
 from . node_position import LastNodePosition
 import tkinter as tk
 from tkinter import filedialog
+from .node_functions import *
 
 # Destroy window if closed
 def callback_close_window(sender):
@@ -39,7 +40,7 @@ def callback_delete_item(sender):
         func_link_destroyed("NodeEditor", selected_link)
 
 def save_node_file(sender, app_data):
-    '''Save the current state of the node editor to a file'''
+    '''Save the current state to a file'''
 
     root = tk.Tk()
 
@@ -78,12 +79,12 @@ class NodeEditor:
                         height=700,
                         pos=[50, 50],
                         menubar=True,
+                        no_open_over_existing_popup=False,
                         on_close=callback_close_window):
 
             # Add a menu bar to the window
             with dpg.menu_bar(label="MenuBar"):
                 pass
-                
                 with dpg.menu(label="Input/Output"):
                     dpg.add_menu_item(tag="Menu_AddNode_InputFloat",
                                       label="Input float",
@@ -161,8 +162,8 @@ class NodeEditor:
                 with dpg.menu(label="Algorithm"):
                     dpg.add_menu_item(tag="Menu_AddNode_Delaunay",
                                       label="Delaunay Triangulation",
-                                      callback=node_binding.add_node_delaunay,
-                                      user_data="Delaunay")
+                                      callback=node_binding.add_node_delaunay)
+                                
 
             with dpg.group(horizontal=True):
                 dpg.add_text("Status:")

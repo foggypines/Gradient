@@ -56,14 +56,14 @@ class CylinderNodeFunction(BaseNodeFunction):
 
                 rad = self.parameter_update(self.rad, node_radius_input, rad)
 
-                make_cylinder(point, vector, rad, self.gui_id)
+                make_cylinder( node_id = self.gui_id, point = point, vector = vector, radius = rad)
 
                 if j == len(self.rad.parameter) - 1:
                     j = 0
                 else:
                     j = j + 1
 
-            make_cylinder([0,0,0], [0,0,0], 0, self.gui_id, True)
+            make_cylinder(node_id = self.gui_id, compute = True)
 
         else: 
 

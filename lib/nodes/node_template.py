@@ -37,6 +37,12 @@ class NodeTemplate:
                           callback = self.add_node,
                           user_data = self.user_data)
         
+    def add_menu_item2(self):
+        dpg.add_menu_item(tag = "help",
+                          label = self.label,
+                          callback = self.generate_gui,
+                          user_data = self.user_data)
+        
     def create_rand_id(self):
         self.random_id = random.randint(0, 50000)
         while dpg.does_item_exist(str(self.random_id) + self.node_type):

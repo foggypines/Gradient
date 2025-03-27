@@ -1,9 +1,11 @@
 import dearpygui.dearpygui as dpg
+import random
 from ... lib.fusionAddInUtils.general_utils import log
 from ... lib.node_functions.node_input import NodeInput, all_node_inputs
 from ... lib.node_functions.node_output import NodeOutput, all_node_outputs
 from ... lib.function_node_dict import function_node_dict
 from ... lib.utility import *
+# from ... lib.nodes.node_themes import error_theme
 from dataclasses import dataclass, field
 from dataclass_wizard import JSONWizard, json_field
 from nutree import Tree, IterMethod
@@ -13,7 +15,7 @@ node_output = "_Output"
 @dataclass(kw_only=True)
 class BaseNodeFunction(JSONWizard):
 
-    gui_id: str
+    gui_id: str = field(default = None)
     inputs: list[NodeInput] = field(repr=False, default_factory = lambda: [])
     output: NodeOutput = field(default = None)
     outputs: list[NodeOutput] = field(repr=False, default_factory = lambda: [])
@@ -21,6 +23,14 @@ class BaseNodeFunction(JSONWizard):
     ui_pos: tuple[int, int] = field(default = (200,200))
 
     def __post_init__(self):
+
+        if self.gui_id is None:
+
+            self.gui_id = str(random.randint(0, 50000))
+
+            while dpg.does_item_exist(self.gui_id):
+
+                self.gui_id = str(random.randint(0, 50000))
 
         if self.output is None:
 
@@ -64,7 +74,15 @@ class BaseNodeFunction(JSONWizard):
         
         if self.inputs_linked():
 
-            self.compute(sender = sender)
+            try:
+
+                self.compute(sender = sender)
+
+                self.good_state()
+
+            except Exception as e:
+
+                self.error_state()
 
             self.set_broadcasts()
 
@@ -164,6 +182,22 @@ class BaseNodeFunction(JSONWizard):
         else:
 
             dpg.set_value(append_value(self.gui_id + input_name), 0)
+
+    def error_state(self):
+        '''This method is called when an error occurs in the node. It changes the color of the node to red to indicate an error.'''
+
+        with dpg.theme() as error_theme:
+            with dpg.theme_component(dpg.mvAll):
+                dpg.add_theme_color(dpg.mvNodeCol_TitleBar, (200, 0, 0), category=dpg.mvThemeCat_Nodes)
+                dpg.add_theme_color(dpg.mvNodeCol_TitleBarSelected, (200, 0, 0), category=dpg.mvThemeCat_Nodes)
+                dpg.add_theme_color(dpg.mvNodeCol_TitleBarHovered, (200, 0, 0), category=dpg.mvThemeCat_Nodes)
+
+        dpg.bind_item_theme(self.gui_id, error_theme)
+
+    def good_state(self):
+        '''Reverts the node to the default theme'''
+        
+        dpg.bind_item_theme(self.gui_id, 0)
                     
     def update_ui_pos(self):
 

@@ -27,7 +27,7 @@ class BaseEventHandler(adsk.core.CustomEventHandler):
 
             color_property = adsk.core.ColorProperty.cast(new_appearance.appearanceProperties.itemByName('Color'))
 
-            color_property.value = adsk.core.Color.create(255,255,255,157)
+            color_property.value = adsk.core.Color.create(255,255,255,255)
 
             roughness_prop = adsk.core.FloatProperty.cast(new_appearance.appearanceProperties.itemByName('Roughness'))
 

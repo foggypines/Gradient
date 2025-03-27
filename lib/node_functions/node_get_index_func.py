@@ -36,7 +36,9 @@ class GetIndexNodeFunction(BaseNodeFunction):
 
             if 0 <= index < len(data):
 
-                temp_result.append(data[index])
+                item = data[index]
+
+                temp_result.append(item)
 
             else:
                 

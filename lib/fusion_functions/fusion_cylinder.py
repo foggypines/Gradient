@@ -23,13 +23,32 @@ class CylinderEventHandler(BaseEventHandler):
             # Get the value from the JSON data passed through the event.
             eventArgs = json.loads(args.additionalInfo)
 
-            compute = bool(eventArgs['compute'])
             delete = bool(eventArgs['delete'])
             node_id = str(eventArgs['node_id'])
 
             #Runs when it times to actually add BRep bodies to the active design
 
-            if compute:
+            if delete:
+
+                attributes = self.design.findAttributes("Node", node_id)
+
+                for attr in attributes:
+
+                    cylinders = self.design.findEntityByToken(attr.value)
+
+                    attr.deleteMe()
+
+                    for cylinder in cylinders:
+
+                        cylinder.deleteMe()
+            
+            else:
+
+                temp_brep_mgr = adsk.fusion.TemporaryBRepManager.get()
+
+                self.rootcomp.bRepBodies
+
+                bodies = self.rootcomp.bRepBodies
 
                 attributes = self.design.findAttributes("Node", node_id)
 
@@ -37,15 +56,7 @@ class CylinderEventHandler(BaseEventHandler):
 
                 attr_len = len(attributes)
 
-                if delete:
-
-                    cylinder_len = 0
-
-                else:
-
-                    cylinder_len = len(self.cylinders)
-
-                bodies = self.rootcomp.bRepBodies
+                cylinder_len = len(self.cylinders)
 
                 while i < max(attr_len, cylinder_len):
 
@@ -53,11 +64,13 @@ class CylinderEventHandler(BaseEventHandler):
 
                         attr = attributes[i]
 
-                        cylinders = self.design.findEntityByToken(attr.value)
+                        old_cylinders = self.design.findEntityByToken(attr.value)
 
-                        for cylinder in cylinders:
+                        for old_cylinder in old_cylinders:
 
-                            self.base_feature.updateBody(cylinder, self.cylinders[i])
+                            cylinder = self.construct_cylinder(self.cylinders[i], temp_brep_mgr)
+
+                            self.base_feature.updateBody(old_cylinder, cylinder)
 
                     elif i < attr_len and i >= cylinder_len: #delete case
 
@@ -73,7 +86,11 @@ class CylinderEventHandler(BaseEventHandler):
 
                     elif i >= attr_len and i < cylinder_len: #add case
 
-                        body = bodies.add(self.cylinders[i], self.base_feature)
+                        cylinder = self.cylinders[i]
+
+                        cylinder_body = self.construct_cylinder(cylinder, temp_brep_mgr)                        
+
+                        body = bodies.add(cylinder_body, self.base_feature)
 
                         self.assign_default_color(body)
 
@@ -89,41 +106,50 @@ class CylinderEventHandler(BaseEventHandler):
 
                 self.cylinders.clear()
 
-            else:
-
-                point_x = float(eventArgs['point_x']) * 0.1
-                point_y = float(eventArgs['point_y']) * 0.1
-                point_z = float(eventArgs['point_z']) * 0.1
-
-                vector_x = float(eventArgs['vector_x']) * 0.1
-                vector_y = float(eventArgs['vector_y']) * 0.1
-                vector_z = float(eventArgs['vector_z']) * 0.1
-
-                radius = float(eventArgs['radius']) * 0.1
-
-                #make a temp brep cylinder
-
-                point1 = adsk.core.Point3D.create(point_x, point_y, point_z)
-
-                point2 = adsk.core.Point3D.create(vector_x, vector_y, vector_z)
-
-                temp_brep_mgr = adsk.fusion.TemporaryBRepManager.get()
-                
-                cylinder = temp_brep_mgr.createCylinderOrCone(point1, radius, point2, radius)
-
-                self.cylinders.append(cylinder)
-
         except:
             if self.ui:
                 self.ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
             adsk.autoTerminate(False)
 
-    def make_cylinder(self, point, vector, radius, node_id, compute = False, delete = False):
+    def construct_cylinder(self, cylinder, temp_brep_mgr):
 
-        return_data = {'point_x': point[0], 'point_y': point[1], 'point_z': point[2],
-                       'vector_x': vector[0], 'vector_y': vector[1], 'vector_z': vector[2],
-                        'radius': radius, 'node_id': node_id, 'compute': compute, 'delete': delete}
+        point_x = float(cylinder.point[0]) * 0.1
+        point_y = float(cylinder.point[1]) * 0.1
+        point_z = float(cylinder.point[2]) * 0.1
 
-        return_json = json.dumps(return_data)
+        vector_x = float(cylinder.vector[0]) * 0.1
+        vector_y = float(cylinder.vector[1]) * 0.1
+        vector_z = float(cylinder.vector[2]) * 0.1
 
-        self.app.fireCustomEvent(cylinder_event_id, return_json)
+        radius = float(cylinder.radius) * 0.1
+
+        # make a temp brep cylinder
+
+        point1 = adsk.core.Point3D.create(point_x, point_y, point_z)
+
+        point2 = adsk.core.Point3D.create(vector_x, vector_y, vector_z)
+        
+        cylinder = temp_brep_mgr.createCylinderOrCone(point1, radius, point2, radius)
+
+        return cylinder
+        
+
+    def make_cylinder(self, node_id, point = None, vector = None, radius = None, compute = False, delete = False):
+
+        if compute == False:
+
+            self.cylinders.append(Cylinder(point, vector, radius))
+
+        else:
+
+            return_data = {'node_id': node_id, 'delete': delete}
+
+            return_json = json.dumps(return_data)
+
+            self.app.fireCustomEvent(cylinder_event_id, return_json)
+
+class Cylinder:
+    def __init__(self, point, vector, radius):
+        self.point = point
+        self.vector = vector
+        self.radius = radius

@@ -26,12 +26,14 @@ from .lib.fusionAddInUtils.general_utils import log
 
 import dearpygui.dearpygui as dpg
 from .lib.node_editor import NodeEditor
+from .lib.nodes.node_themes import apply_gradient_themes
 from .lib.node_functions import node_sphere_func
 from .lib.node_functions import node_cylinder_func
 from .lib.node_functions import node_union_func
 from .lib.node_functions import node_transform_func
 from .lib.node_functions import node_brep_box_func
 from .lib.node_functions import node_get_BReP_func as node_brep_func
+from .lib.fusion_functions.event_registrar import EventRegistrar
 
 app = None
 ui = adsk.core.UserInterface.cast(None)
@@ -39,7 +41,7 @@ handlers = []
 stopFlag = None
 
 # The class for the new thread.
-class MyThread(threading.Thread):
+class GradientThread(threading.Thread):
     def __init__(self, event, on_sphere_event, on_cylinder_event,
                 on_union_event, on_transform_event, on_brep_box_event, on_brep_get_event):
         threading.Thread.__init__(self)
@@ -51,6 +53,7 @@ class MyThread(threading.Thread):
         self.on_transform_event = on_transform_event
         self.on_brep_box_event = on_brep_box_event
         self.on_brep_get_event = on_brep_get_event
+
 
     def run(self):
 
@@ -71,6 +74,8 @@ class MyThread(threading.Thread):
 
             nodeEditor = NodeEditor()
 
+        apply_gradient_themes()
+
         # Setup API connections
         # node_point_func.point_instance.setup(make_point)
 
@@ -90,6 +95,7 @@ class MyThread(threading.Thread):
 def run(context):
     global ui
     global app
+    global event_registrar
     try:
 
         app = adsk.core.Application.get()
@@ -100,60 +106,24 @@ def run(context):
 
         fusion_handler = FusionHandler(app, ui)
 
-        # Register the sphere custom event and connect the handler.
-        global sphere_event
-        sphere_event = app.registerCustomEvent(Sphere_event_id)
-        on_sphere_event = SphereEventHandler(app, ui, fusion_handler.design, fusion_handler.base_feature)
-        sphere_event.add(on_sphere_event)
-        handlers.append(on_sphere_event)
+        event_registrar = EventRegistrar(app, fusion_handler)
 
-        # Register the cylinder custom event and connect the handler.
-        global cylinder_event
-        cylinder_event = app.registerCustomEvent(cylinder_event_id)
-        on_cylinder_event = CylinderEventHandler(app, ui, fusion_handler.design, fusion_handler.base_feature)
-        cylinder_event.add(on_cylinder_event)
-        handlers.append(on_cylinder_event)
-
-        # Register the on Union custom event and connect the handler
-
-        global union_event
-        union_event = app.registerCustomEvent(union_event_id)
-        on_union_event = UnionEventHandler(app, ui, fusion_handler.design, fusion_handler.base_feature)
-        union_event.add(on_union_event)
-        handlers.append(on_union_event)
-
-        # Register the transform bodies custom event and connect the handler
-
-        global transform_event
-        transform_event = app.registerCustomEvent(transform_event_id)
-        on_transform_event = TransformEventHandler(app, ui, fusion_handler.design, fusion_handler.base_feature)
-        transform_event.add(on_transform_event)
-        handlers.append(on_transform_event)
-
-        # Register the BReP get custom event and connect the handler
-
-        global brep_get_event
-        brep_get_event = app.registerCustomEvent(brep_get_event_id)
-        on_brep_get_event = BRePGetEventHandler(app, ui, fusion_handler.design, fusion_handler.base_feature)
-        brep_get_event.add(on_brep_get_event)
-        handlers.append(on_brep_get_event)
-
-        #Register the BReP box custom event and connect the handler
-
-        global brep_box_event
-        brep_box_event = app.registerCustomEvent(brep_box_event_id)
-        on_brep_box_event = BRePBoxEventHandler(app, ui, fusion_handler.design, fusion_handler.base_feature)
-        brep_box_event.add(on_brep_box_event)
-        handlers.append(on_brep_box_event)
+        on_sphere_event, sphere_event = event_registrar.register_event(Sphere_event_id, SphereEventHandler)
+        on_cylinder_event, cylinder_event = event_registrar.register_event(cylinder_event_id, CylinderEventHandler)
+        on_union_event, union_event = event_registrar.register_event(union_event_id, UnionEventHandler)
+        on_transform_event, transform_event = event_registrar.register_event(transform_event_id, TransformEventHandler)
+        on_brep_get_event, brep_get_event = event_registrar.register_event(brep_get_event_id, BRePGetEventHandler)
+        on_brep_box_event, brep_box_event = event_registrar.register_event(brep_box_event_id, BRePBoxEventHandler)
 
         # Create a new thread for the node processing.        
         global stopFlag        
         stopFlag = threading.Event()
-        myThread = MyThread(stopFlag, on_sphere_event, on_cylinder_event,
+        gradient_Thread = GradientThread(stopFlag, on_sphere_event, on_cylinder_event,
                             on_union_event, on_transform_event=on_transform_event,
                             on_brep_box_event=on_brep_box_event,
                             on_brep_get_event=on_brep_get_event)
-        myThread.start()
+        
+        gradient_Thread.start()
 
         log("Gradient Started")
 
@@ -163,11 +133,10 @@ def run(context):
 
 def stop(context):
     try:
-        if handlers.count:
-            sphere_event.remove(handlers[0])
-        stopFlag.set() 
-        app.unregisterCustomEvent(Sphere_event_id)
+        event_registrar.clean_up_events()
+
         log("Gradient Stopped")
+
     except:
         if ui:
             ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
