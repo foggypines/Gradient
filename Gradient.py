@@ -22,6 +22,8 @@ from .lib.fusion_functions.fusion_union import union_event_id, union_event, Unio
 from .lib.fusion_functions.fusion_transform import transform_event_id, transform_event, TransformEventHandler
 from .lib.fusion_functions.fusion_brep_box import brep_box_event_id, brep_box_event, BRePBoxEventHandler
 from .lib.fusion_functions.fusion_get_brep import brep_get_event_id, brep_get_event, BRePGetEventHandler
+from .lib.fusion_functions.fusion_point_on_face import point_on_face_event_id, point_on_face_event, PointOnFaceEventHandler
+from .lib.fusion_functions.event_registrar import EventRegistrar
 from .lib.fusionAddInUtils.general_utils import log
 
 import dearpygui.dearpygui as dpg
@@ -33,7 +35,8 @@ from .lib.node_functions import node_union_func
 from .lib.node_functions import node_transform_func
 from .lib.node_functions import node_brep_box_func
 from .lib.node_functions import node_get_BReP_func as node_brep_func
-from .lib.fusion_functions.event_registrar import EventRegistrar
+from .lib.node_functions import node_point_on_face_func
+
 
 app = None
 ui = adsk.core.UserInterface.cast(None)
@@ -43,7 +46,8 @@ stopFlag = None
 # The class for the new thread.
 class GradientThread(threading.Thread):
     def __init__(self, event, on_sphere_event, on_cylinder_event,
-                on_union_event, on_transform_event, on_brep_box_event, on_brep_get_event):
+                on_union_event, on_transform_event, on_brep_box_event, on_brep_get_event, 
+                on_point_on_face_event):
         threading.Thread.__init__(self)
         self.stopped = event
 
@@ -53,6 +57,7 @@ class GradientThread(threading.Thread):
         self.on_transform_event = on_transform_event
         self.on_brep_box_event = on_brep_box_event
         self.on_brep_get_event = on_brep_get_event
+        self.on_point_on_face_event = on_point_on_face_event
 
 
     def run(self):
@@ -85,6 +90,7 @@ class GradientThread(threading.Thread):
         node_transform_func.transform_bodies = self.on_transform_event.transform_bodies
         node_brep_box_func.make_box = self.on_brep_box_event.make_box
         node_brep_func.get_brep = self.on_brep_get_event.get_brep
+        node_point_on_face_func.point_on_face = self.on_point_on_face_event.point_on_face
 
         # Main GUI Loop
         dpg.setup_dearpygui()
@@ -114,6 +120,7 @@ def run(context):
         on_transform_event, transform_event = event_registrar.register_event(transform_event_id, TransformEventHandler)
         on_brep_get_event, brep_get_event = event_registrar.register_event(brep_get_event_id, BRePGetEventHandler)
         on_brep_box_event, brep_box_event = event_registrar.register_event(brep_box_event_id, BRePBoxEventHandler)
+        on_point_on_face_event, point_on_face_event = event_registrar.register_event(point_on_face_event_id, PointOnFaceEventHandler)
 
         # Create a new thread for the node processing.        
         global stopFlag        
@@ -121,7 +128,8 @@ def run(context):
         gradient_Thread = GradientThread(stopFlag, on_sphere_event, on_cylinder_event,
                             on_union_event, on_transform_event=on_transform_event,
                             on_brep_box_event=on_brep_box_event,
-                            on_brep_get_event=on_brep_get_event)
+                            on_brep_get_event=on_brep_get_event,
+                            on_point_on_face_event=on_point_on_face_event)
         
         gradient_Thread.start()
 

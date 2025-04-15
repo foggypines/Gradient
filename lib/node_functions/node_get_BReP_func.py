@@ -23,6 +23,6 @@ class GetBRepNodeFunction(BaseNodeFunction):
 
     def compute(self, sender=None, app_data=None):
 
-        get_brep(self.gui_id)
+        brep = get_brep(self.gui_id)
 
-        self.output.payload = self.gui_id
+        self.output.payload = brep

@@ -12,6 +12,8 @@ class BRePGetEventHandler(BaseEventHandler):
         BaseEventHandler.__init__(self, app, ui, design, base_feature)
         self.tokens = []
 
+        self.brep = None
+
     def notify(self, args):
         try:
             # Make sure a command isn't running before changes are made.
@@ -39,15 +41,26 @@ class BRePGetEventHandler(BaseEventHandler):
 
                 body.attributes.add("Node", node_id, brepbody.entityToken)
 
+            self.brep = body
+
         except:
+            
             if self.ui:
                 self.ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
             adsk.autoTerminate(False)
 
+            self.brep = False
+
     def get_brep(self, node_id: str):
+
         return_data = {'node_id': node_id}
 
         json_bytes = orjson.dumps(return_data, option=orjson.OPT_SERIALIZE_NUMPY)
+        
         json_str = json_bytes.decode()
 
         self.app.fireCustomEvent(brep_get_event_id, json_str)
+
+        while self.brep is None:
+            pass
+        return self.brep

@@ -28,8 +28,8 @@ class NodeTemplate:
 
                 with dpg.node_attribute(tag = node_output.full_id,
                                         attribute_type = dpg.mvNode_Attr_Output):
-                    dpg.add_spacer(tag = input_node.gui_id + node_output.full_id + "_space",
-                        width=150, height=25)
+                    dpg.add_text(default_value = node_output.ui_label, indent = 90)
+                    dpg.add_spacer(tag = input_node.gui_id + node_output.full_id + "_space", width = 150)
 
     def add_menu_item(self):
         dpg.add_menu_item(tag = self.tag,

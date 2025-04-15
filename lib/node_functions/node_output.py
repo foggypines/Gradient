@@ -10,6 +10,7 @@ class NodeOutput(JSONWizard):
 
     gui_id: str
     full_id: str
+    ui_label: str = str()
     payload: np.float64 = field(default_factory = lambda: np.array([0], np.float64))
     links: list = field(default_factory = lambda: [])
 

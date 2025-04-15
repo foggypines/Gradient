@@ -17,6 +17,7 @@ class BaseNodeFunction(JSONWizard):
 
     gui_id: str = field(default = None)
     inputs: list[NodeInput] = field(repr=False, default_factory = lambda: [])
+    input_sets: dict[list[NodeInput]] = field(repr=False, default_factory = lambda: {})
     output: NodeOutput = field(default = None)
     outputs: list[NodeOutput] = field(repr=False, default_factory = lambda: [])
     uptodate: bool = field(default = True)
@@ -38,7 +39,8 @@ class BaseNodeFunction(JSONWizard):
 
         self.outputs.append(self.output)
 
-    def add_input(self, input_name: str, ui_element: bool = False, required: bool = True, ui_label = str()):
+    def add_input(self, input_name: str, ui_element: bool = False,
+                   required: bool = True, ui_label = str(), input_set: str = None):
 
         node_input = NodeInput(gui_id=self.gui_id,
                             full_id=self.gui_id + input_name,
@@ -46,27 +48,50 @@ class BaseNodeFunction(JSONWizard):
                             required=required,
                             ui_label=ui_label)
         
+        if input_set is not None:
+
+            if input_set not in self.input_sets.keys():
+
+                self.input_sets[input_set] = []
+
+            self.input_sets[input_set].append(node_input)
+        
         self.inputs.append(node_input)
 
         return node_input
     
-    def add_output(self, output_name: str):
+    def add_output(self, output_name: str, ui_label = str()):
         
-        node_output = NodeOutput(gui_id = self.gui_id, full_id = self.gui_id + output_name)
+        node_output = NodeOutput(gui_id = self.gui_id, full_id = self.gui_id + output_name, ui_label = ui_label)
 
         return node_output
 
-    #Validates if all required inputs are linked.
-    #This is the default base where all none ui elements are checked
     def inputs_linked(self):
+        '''This method checks if all inputs are linked. 
+        If any input is not linked and is required, it returns False. Otherwise, it returns True.
+        Override this method to implement node specific logic for which inputs are required.'''
 
         inputs_linked = True
 
-        for input in self.inputs:
+        # Check if any input is not linked and is required, without special sets defined
+        if self.input_sets == {}:
 
-            if input.linked == False and input.ui_element == False and input.required == True:
+            for input in self.inputs:
 
-                inputs_linked = False
+                if input.linked == False and input.ui_element == False and input.required == True:
+
+                    inputs_linked = False
+
+        else:
+
+            for key, inputs in self.input_sets.items():
+
+                # Check if any set in input_sets has all inputs linked
+                if all(input.linked or input.ui_element for input in inputs):
+                    inputs_linked = True
+                    break  # No need to check further if one set is fully linked
+                else:
+                    inputs_linked = False
 
         return inputs_linked
 

@@ -45,8 +45,6 @@ class TransformEventHandler(BaseEventHandler):
 
                 temp_brep_mgr = adsk.fusion.TemporaryBRepManager.get()
 
-                #Runs when it times to actually update BRep bodies to the active design
-
                 attributes_a = self.design.findAttributes("Node", brep_input)
 
                 attr = attributes_a[0]

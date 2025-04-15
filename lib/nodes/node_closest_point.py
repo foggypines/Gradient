@@ -41,10 +41,6 @@ def add_node_gui(input_node = None):
             
             dpg.add_spacer(tag = input_node.gui_id + "_space1",
                 width=150)
-
-        # for node_output in input_node.outputs: 
-            
-        #     node_template.add_from_node_output(node_output=node_output)
             
         with dpg.node_attribute(tag = input_node.gui_id + node_output,
                         attribute_type=dpg.mvNode_Attr_Output):

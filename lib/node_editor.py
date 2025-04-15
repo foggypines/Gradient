@@ -73,6 +73,8 @@ class NodeEditor:
         dpg.add_button(label="Load",
                        callback=load_node_file)
 
+        # dpg.window(tag="NodeEditorWindow")
+
         with dpg.window(tag="NodeEditorWindow",
                         label="Node editor",
                         width=1000,
@@ -81,8 +83,10 @@ class NodeEditor:
                         menubar=True,
                         no_open_over_existing_popup=False,
                         on_close=callback_close_window):
+            
+            pass
 
-            # Add a menu bar to the window
+            #Add a menu bar to the window
             with dpg.menu_bar(label="MenuBar"):
                 pass
                 with dpg.menu(label="Input/Output"):
@@ -131,6 +135,9 @@ class NodeEditor:
                     dpg.add_menu_item(tag = "Menu_AddNode_BoundingBox",
                                       label = "Bounding Box",
                                       callback = node_binding.add_node_bounding_box)
+                    dpg.add_menu_item(tag = "Menu_line",
+                                      label = "Line",
+                                      callback = node_binding.add_node_line)
 
                 with dpg.menu(label = "Evaluate"):
                     dpg.add_menu_item(tag = "Menu_AddNode_CloestPoint",
@@ -158,18 +165,27 @@ class NodeEditor:
                     dpg.add_menu_item(tag = "Menu_AddNode_GetBRep",
                                       label = "Get BRep",
                                       callback = node_binding.add_node_get_brep)
+                    dpg.add_menu_item(tag = "Menu_AddNode_BRep",
+                                      label = "BRep",
+                                      callback = node_binding.add_node_brep)
                     
                 with dpg.menu(label="Algorithm"):
                     dpg.add_menu_item(tag="Menu_AddNode_Delaunay",
                                       label="Delaunay Triangulation",
                                       callback=node_binding.add_node_delaunay)
-                                
+                    dpg.add_menu_item(tag="Menu_AddNode_Voronoi",
+                                      label="Voronoi",
+                                      callback=node_binding.add_node_voronoi)
+                    dpg.add_menu_item(tag="Menu_AddNode_PointOnFace",
+                                      label="Point on Face",
+                                      callback=node_binding.add_node_point_on_face,
+                                      user_data="Point on Face")                   
 
             with dpg.group(horizontal=True):
                 dpg.add_text("Status:")
                 dpg.add_text(tag="InfoBar")
 
-            # Add node editor to the window
+            #Add node editor to the window
             with dpg.node_editor(tag="NodeEditor",
                                  
                                  # Function call for updating all nodes if a new link is created
