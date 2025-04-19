@@ -1,8 +1,6 @@
 import json
-from time import sleep
 from .fusion_event_handler_base import BaseEventHandler
 import adsk.core, adsk.fusion, adsk.cam, traceback
-import random
 import numpy as np
 
 point_on_face_event_id = 'PointOnFaceEventId'

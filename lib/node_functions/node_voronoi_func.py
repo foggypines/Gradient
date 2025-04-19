@@ -4,15 +4,19 @@ from .node_input import NodeInput
 from .node_output import NodeOutput
 from .node_base_func import BaseNodeFunction
 from dataclasses import dataclass, field
+import adsk.core, adsk.fusion
+
 
 node_name = "Voronoi"
 point_set_name = "_Point_set"
-output2_name = "_Output2"
+boundary_name = "_Boundary"
 
 @dataclass
 class VoronoiNodeFunction(BaseNodeFunction):
 
     point_set: NodeInput = field(default = None)
+
+    boundary: NodeInput = field(default = None)
 
     def __post_init__(self):
 
@@ -20,16 +24,13 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
         if self.point_set is None:
 
-            self.point_set = self.add_input(point_set_name)
+            self.point_set = self.add_input(point_set_name, required=True, ui_label="Point Set")
+
+        if self.boundary is None:
+
+            self.boundary = self.add_input(boundary_name, required=True, ui_label="Boundary")
 
     def compute(self, sender=None, app_data=None):
-
-        # points = np.array([[0, 0, 0], [0, 1, 0], [0, 2, 0], [1, 0, 0], [1, 1, 0], [1, 2, 0],
-        #                 [2, 0, 0], [2, 1, 0], [2, 2, 0],
-        #                 [0, 0, 1], [0, 1, 1], [0, 2, 1], [1, 0, 1], [1, 1, 1], [1, 2, 1],
-        #                 [2, 0, 1], [2, 1, 1], [2, 2, 1],
-        #                 [0, 0, 2], [0, 1, 2], [0, 2, 2], [1, 0, 2], [1, 1, 2], [1, 2, 2],
-        #                 [2, 0, 2], [2, 1, 2], [2, 2, 2]])
 
         points = self.point_set.parameter
 
@@ -83,12 +84,74 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
         line_vertices = np.unique(line_vertices, axis=0)
 
+        brep = self.boundary.parameter[0]
+
+        app = adsk.core.Application.get()
+
+        self.design = adsk.fusion.Design.cast(app.activeProduct)
+        
+        rootcomp = self.design.rootComponent
+
         for pair in line_vertices:
 
             v1 = vertices[pair[0]]
 
             v2 = vertices[pair[1]]
 
-            lines.append([v1, v2])
+            point1 = adsk.core.Point3D.create(v1[0] * 0.1, v1[1] * 0.1, v1[2] * 0.1) 
+
+            point2 = adsk.core.Point3D.create(v2[0] * 0.1, v2[1] * 0.1, v2[2] * 0.1)
+
+            containment1 = brep.pointContainment(point1)
+
+            containment2 = brep.pointContainment(point2)
+
+            if containment1 == 2 and containment2 == 2:
+
+                continue
+
+            elif containment1 == 2 and containment2 != 2:
+
+                ori = adsk.core.Point3D.create(v2[0] * 0.1, v2[1] * 0.1, v2[2] * 0.1)
+
+                x = (v1[0] - v2[0])
+                y = (v1[1] - v2[1])
+                z = (v1[2] - v2[2])
+
+                ray = adsk.core.Vector3D.create(x, y, z)
+
+                hitpoints = adsk.core.ObjectCollection.create()
+
+                coll = rootcomp.findBRepUsingRay(ori, ray, 1, -1.0, True, hitpoints)
+
+                if len(coll) > 0:
+
+                    v1 = [hitpoints[0].x*10, hitpoints[0].y*10, hitpoints[0].z*10]
+
+                    lines.append([v1, v2])
+
+            elif containment1 != 2 and containment2 == 2:
+
+                ori = adsk.core.Point3D.create(v1[0] * 0.1, v1[1] * 0.1, v1[2] * 0.1)
+
+                x = (v2[0] - v1[0])
+                y = (v2[1] - v1[1])
+                z = (v2[2] - v1[2])
+
+                ray = adsk.core.Vector3D.create(x, y, z)
+
+                hitpoints = adsk.core.ObjectCollection.create()
+
+                coll = rootcomp.findBRepUsingRay(ori, ray, 1, -1.0, True, hitpoints)
+
+                if len(coll) > 0:
+
+                    v2 = [hitpoints[0].x*10, hitpoints[0].y*10, hitpoints[0].z*10]
+
+                    lines.append([v1, v2])
+
+            else:
+
+                lines.append([v1, v2])
 
         self.output.payload = np.array(lines)
