@@ -1,15 +1,20 @@
+import array
 import numpy as np
+from numpy.linalg import multi_dot
 from scipy.spatial import Voronoi
 from .node_input import NodeInput
 from .node_output import NodeOutput
 from .node_base_func import BaseNodeFunction
 from dataclasses import dataclass, field
+from itertools import combinations
 import adsk.core, adsk.fusion
 
 
 node_name = "Voronoi"
 point_set_name = "_Point_set"
 boundary_name = "_Boundary"
+
+tolerance=1e-6
 
 @dataclass
 class VoronoiNodeFunction(BaseNodeFunction):
@@ -32,126 +37,153 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
     def compute(self, sender=None, app_data=None):
 
+        #Get resources for generating faces
+
+        app = adsk.core.Application.get()
+
+        self.design = adsk.fusion.Design.cast(app.activeProduct)
+        
+        temp_brep_mgr = adsk.fusion.TemporaryBRepManager.get()
+
+        rootcomp = self.design.rootComponent
+
+        base_feature_attr_name = "gradient_base_feature"
+
+        base_feature_attr_group = "gradient"
+
+        attributes = self.design.findAttributes(groupName=base_feature_attr_group, 
+                                        attributeName=base_feature_attr_name)
+
+        base_feature = attributes[0].parent
+
+        bodies = rootcomp.bRepBodies
+
+        boundary = self.boundary.parameter
+
+        #Getting starting values and do initial voroi calculation
+
         points = self.point_set.parameter
 
         vor = Voronoi(points)
 
         vertices = vor.vertices
 
+        regions = vor.regions
+
         ridge_vertices = vor.ridge_vertices
 
-        lines = []
+        ridge_points = vor.ridge_points
 
-        line_vertices = []
+        # Map voronoi vertices to faces
 
-        for i in range(len(ridge_vertices)):
+        voronoi_cells = []
 
-            ridge = ridge_vertices[i]
+        for region in regions:
 
-            if -1 in ridge or len(ridge) == 0:
+            cell = VoronoiCell(region)
 
+            if region == [] or -1 in region:
                 continue
 
             else:
 
-                ridge_len = len(ridge)
+                for ridge in ridge_vertices:
 
-                j = 0
+                    if all(v in region for v in ridge):
 
-                while j < ridge_len:
+                        cell.ridges.append(ridge)
 
-                    if j == ridge_len - 1:
+                for ridge in cell.ridges:
 
-                        t = 0
+                    j = 0
 
-                    else:
+                    face = VoronoiFace()
+                    
+                    edge_len = len(ridge)
 
-                        t = j + 1
+                    while j < edge_len:
 
-                    v1 = ridge[j]
+                        if j == edge_len - 1:
 
-                    v2 = ridge[t]
+                            t = 0
 
-                    pair = [v1, v2]
+                        else:
 
-                    pair.sort()
+                            t = j + 1
 
-                    line_vertices.append(pair)
+                        v1 = ridge[j]
 
-                    j += 1
+                        v2 = ridge[t]
 
-        line_vertices = np.array(line_vertices)
+                        pair = [v1, v2]
 
-        line_vertices = np.unique(line_vertices, axis=0)
+                        j += 1
 
-        brep = self.boundary.parameter[0]
+                        face.edges.append(pair)
 
-        app = adsk.core.Application.get()
+                    cell.faces.append(face)
 
-        self.design = adsk.fusion.Design.cast(app.activeProduct)
+                voronoi_cells.append(cell)
+
+        #create the faces
+
+        for cell in voronoi_cells:
+
+            for face in cell.faces:
+
+                curves = []
+
+                for edge in face.edges:
+
+                    start = vertices[edge[0]]
+
+                    end = vertices[edge[1]]
+
+                    start_point = adsk.core.Point3D.create(start[0]*0.1, start[1]*0.1, start[2]*0.1)
+
+                    end_point = adsk.core.Point3D.create(end[0]*0.1, end[1]*0.1, end[2]*0.1)
+
+                    line_segment = adsk.core.Line3D.create(start_point, end_point)
+
+                    curves.append(line_segment)
+
+                wirebody, edgeMap = temp_brep_mgr.createWireFromCurves(curves)
+
+                wire_bodies = []
+
+                wire_bodies.append(wirebody)
+
+                brep_face = temp_brep_mgr.createFaceFromPlanarWires(wire_bodies)
+
+                body = bodies.add(brep_face, base_feature)
+
+        adsk.doEvents()
+
+class VoronoiCell:
+    def __init__(self, vertex_indices):
+        self.vertex_indices = vertex_indices
+        self.ridges = []
+        self.faces = []
+
+class VoronoiFace:
+    def __init__(self):
+        self.edges = []
+
+class Plane:
+    
+    def __init__(self, vec1, vec2, point):
         
-        rootcomp = self.design.rootComponent
+        self.normal = np.cross(vec1, vec2)
+        
+        self.a, self.b, self.c = self.normal
 
-        for pair in line_vertices:
+        self.d = -np.dot(self.normal, point)
+        
 
-            v1 = vertices[pair[0]]
+    def distance_to_point(self, point):
 
-            v2 = vertices[pair[1]]
+        x, y, z = point
 
-            point1 = adsk.core.Point3D.create(v1[0] * 0.1, v1[1] * 0.1, v1[2] * 0.1) 
+        distance = np.abs(self.a * x + self.b * y + self.c * z + self.d) / np.sqrt(self.a**2 + self.b**2 + self.c**2)
 
-            point2 = adsk.core.Point3D.create(v2[0] * 0.1, v2[1] * 0.1, v2[2] * 0.1)
-
-            containment1 = brep.pointContainment(point1)
-
-            containment2 = brep.pointContainment(point2)
-
-            if containment1 == 2 and containment2 == 2:
-
-                continue
-
-            elif containment1 == 2 and containment2 != 2:
-
-                ori = adsk.core.Point3D.create(v2[0] * 0.1, v2[1] * 0.1, v2[2] * 0.1)
-
-                x = (v1[0] - v2[0])
-                y = (v1[1] - v2[1])
-                z = (v1[2] - v2[2])
-
-                ray = adsk.core.Vector3D.create(x, y, z)
-
-                hitpoints = adsk.core.ObjectCollection.create()
-
-                coll = rootcomp.findBRepUsingRay(ori, ray, 1, -1.0, True, hitpoints)
-
-                if len(coll) > 0:
-
-                    v1 = [hitpoints[0].x*10, hitpoints[0].y*10, hitpoints[0].z*10]
-
-                    lines.append([v1, v2])
-
-            elif containment1 != 2 and containment2 == 2:
-
-                ori = adsk.core.Point3D.create(v1[0] * 0.1, v1[1] * 0.1, v1[2] * 0.1)
-
-                x = (v2[0] - v1[0])
-                y = (v2[1] - v1[1])
-                z = (v2[2] - v1[2])
-
-                ray = adsk.core.Vector3D.create(x, y, z)
-
-                hitpoints = adsk.core.ObjectCollection.create()
-
-                coll = rootcomp.findBRepUsingRay(ori, ray, 1, -1.0, True, hitpoints)
-
-                if len(coll) > 0:
-
-                    v2 = [hitpoints[0].x*10, hitpoints[0].y*10, hitpoints[0].z*10]
-
-                    lines.append([v1, v2])
-
-            else:
-
-                lines.append([v1, v2])
-
-        self.output.payload = np.array(lines)
+        return distance

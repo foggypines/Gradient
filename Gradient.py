@@ -26,6 +26,8 @@ from .lib.fusion_functions.fusion_point_on_face import point_on_face_event_id, p
 from .lib.fusion_functions.event_registrar import EventRegistrar
 from .lib.fusionAddInUtils.general_utils import log
 
+from .lib.node_functions.node_voronoi_func import Voronoi
+
 import dearpygui.dearpygui as dpg
 from .lib.node_editor import NodeEditor
 from .lib.nodes.node_themes import apply_gradient_themes
@@ -121,6 +123,8 @@ def run(context):
         on_brep_get_event, brep_get_event = event_registrar.register_event(brep_get_event_id, BRePGetEventHandler)
         on_brep_box_event, brep_box_event = event_registrar.register_event(brep_box_event_id, BRePBoxEventHandler)
         on_point_on_face_event, point_on_face_event = event_registrar.register_event(point_on_face_event_id, PointOnFaceEventHandler)
+
+        Voronoi.base_feature = fusion_handler.base_feature
 
         # Create a new thread for the node processing.        
         global stopFlag        
