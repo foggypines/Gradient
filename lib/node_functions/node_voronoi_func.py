@@ -58,7 +58,9 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
         bodies = rootcomp.bRepBodies
 
-        boundary = self.boundary.parameter[0]
+        complex_boundary = self.boundary.parameter[0]
+
+        # bounding_box = temp_brep_mgr.createBox(complex_boundary.orientedMinimumBoundingBox)
 
         #Initial Voronoi calculation
 
@@ -157,7 +159,11 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                             l2 = vertices[l2_i]
 
-                            # move the point out from the cell a bit
+                            a1 = l1
+
+                            a2 = l2
+
+                            # Compute a vector that represents the edge of the face running out to inifinity
 
                             l_vec = l2 - l1
 
@@ -173,7 +179,7 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                             p_vec = p2 - p1
 
-                            out_vec = np.cross(l_vec, p_vec) * 1.1
+                            out_vec = np.cross(l_vec, p_vec) * 2 # multiply by 2 to space the point out a bit from the starting location
 
                             l1_a = l1 + out_vec
 
@@ -183,23 +189,45 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                             b_dist = np.linalg.norm(l1_b - center)
 
+                            # determine which direction sets the vector in the right direction
+
                             if a_dist > b_dist:
 
-                                l1 = l1_a
-
-                                l2 = l2 + out_vec
+                                out_vec = out_vec
 
                             else:
 
-                                l1 = l1_b
+                                out_vec = -out_vec
 
-                                l2 = l2 - out_vec
+                            l1_hit_points = adsk.core.ObjectCollection.create()
 
-                            if not np.array_equal(l1, l2):
+                            l2_hit_points = adsk.core.ObjectCollection.create()
 
-                                line = np.array([l1, l2])
+                            l1_fusion = adsk.core.Point3D.create(l1[0] * 0.1, l1[1]*0.1, l1[2]*0.1)
 
-                                line_pairs.append(line)
+                            l2_fusion = adsk.core.Point3D.create(l2[0] * 0.1, l2[1] * 0.1, l2[2] *0.1)
+
+                            out_vec_fusion = adsk.core.Vector3D.create(out_vec[0],out_vec[1],out_vec[2])
+
+                            coll=rootcomp.findBRepUsingRay(l1_fusion, out_vec_fusion, 1, -1.0, True, l1_hit_points)
+
+                            coll=rootcomp.findBRepUsingRay(l2_fusion, out_vec_fusion, 1, -1.0, True, l2_hit_points)
+
+                            l1_fusion = l1_hit_points.item(0)
+
+                            l2_fusion = l2_hit_points.item(0)
+
+                            l1 = np.array([l1_fusion.x, l1_fusion.y, l1_fusion.z])
+
+                            l1 *= 10
+
+                            l2 = np.array([l2_fusion.x, l2_fusion.y, l2_fusion.z])
+
+                            l2 *= 10
+
+                            line_pairs.append([a1, l1])
+
+                            line_pairs.append([a2, l2])
 
                         j += 1
 
@@ -209,7 +237,7 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                 voronoi_cells.append(cell)
 
-        #create the faces
+        #create finite faces
 
         for cell in voronoi_cells:
 
