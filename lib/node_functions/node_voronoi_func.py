@@ -53,6 +53,8 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
         attributes = self.design.findAttributes(groupName=base_feature_attr_group, 
                                         attributeName=base_feature_attr_name)
+        
+        stitch_features = rootcomp.features.stitchFeatures
 
         base_feature = attributes[0].parent
 
@@ -60,18 +62,22 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
         complex_boundary = self.boundary.parameter[0]
 
-        # bounding_box = temp_brep_mgr.createBox(complex_boundary.orientedMinimumBoundingBox)
+        bounding_box = complex_boundary.boundingBox
+
+        #use this to detemine how much to offset clipped faces
+
+        bounding_box_radii = (bounding_box.minPoint.distanceTo(bounding_box.maxPoint) / 2) * 10
 
         #Initial Voronoi calculation
 
-        # points = self.point_set.parameter
+        points = self.point_set.parameter
 
-        points = np.array([[0, 0, 0], [0, 1, 0], [0, 2, 0], [1, 0, 0], [1, 1, 0], [1, 2, 0],
-                        [2, 0, 0], [2, 1, 0], [2, 2, 0],
-                        [0, 0, 1], [0, 1, 1], [0, 2, 1], [1, 0, 1], [1, 1, 1], [1, 2, 1],
-                        [2, 0, 1], [2, 1, 1], [2, 2, 1],
-                        [0, 0, 2], [0, 1, 2], [0, 2, 2], [1, 0, 2], [1, 1, 2], [1, 2, 2],
-                        [2, 0, 2], [2, 1, 2], [2, 2, 2]])
+        # points = np.array([[0, 0, 0], [0, 1, 0], [0, 2, 0], [1, 0, 0], [1, 1, 0], [1, 2, 0],
+        #                 [2, 0, 0], [2, 1, 0], [2, 2, 0],
+        #                 [0, 0, 1], [0, 1, 1], [0, 2, 1], [1, 0, 1], [1, 1, 1], [1, 2, 1],
+        #                 [2, 0, 1], [2, 1, 1], [2, 2, 1],
+        #                 [0, 0, 2], [0, 1, 2], [0, 2, 2], [1, 0, 2], [1, 1, 2], [1, 2, 2],
+        #                 [2, 0, 2], [2, 1, 2], [2, 2, 2]])
 
         vor = Voronoi(points)
 
@@ -87,9 +93,13 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
         line_pairs = []
 
+        clipped_faces = [] #for storing finite clipped faces
+
+        clipped_cells = []
+
         #compute some stats on the generated points
 
-        center = vor.points.mean(axis=0)
+        input_points_center = vor.points.mean(axis=0)
 
         # Map voronoi vertices to faces
 
@@ -113,6 +123,8 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                         cell.ridge_indices.append(i)
 
+                has_infinity = False
+
                 for k in range(len(cell.ridges)):
 
                     j = 0
@@ -125,7 +137,9 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                     ridge_point_indices = cell.ridge_indices[k]
 
-                    has_infinity = any(v == -1 for v in ridge)
+                    if has_infinity == False:
+
+                        has_infinity = any(v == -1 for v in ridge)
 
                     while j < edge_len:
 
@@ -185,9 +199,9 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                             l1_b = l1 - out_vec
 
-                            a_dist = np.linalg.norm(l1_a - center)
+                            a_dist = np.linalg.norm(l1_a - input_points_center)
 
-                            b_dist = np.linalg.norm(l1_b - center)
+                            b_dist = np.linalg.norm(l1_b - input_points_center)
 
                             # determine which direction sets the vector in the right direction
 
@@ -199,35 +213,29 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                                 out_vec = -out_vec
 
-                            l1_hit_points = adsk.core.ObjectCollection.create()
+                            out_vec_unit = out_vec / np.linalg.norm(out_vec) #Get the out vector in unit vector form
 
-                            l2_hit_points = adsk.core.ObjectCollection.create()
+                            l1 = l1 + out_vec_unit * bounding_box_radii
 
-                            l1_fusion = adsk.core.Point3D.create(l1[0] * 0.1, l1[1]*0.1, l1[2]*0.1)
-
-                            l2_fusion = adsk.core.Point3D.create(l2[0] * 0.1, l2[1] * 0.1, l2[2] *0.1)
-
-                            out_vec_fusion = adsk.core.Vector3D.create(out_vec[0],out_vec[1],out_vec[2])
-
-                            coll=rootcomp.findBRepUsingRay(l1_fusion, out_vec_fusion, 1, -1.0, True, l1_hit_points)
-
-                            coll=rootcomp.findBRepUsingRay(l2_fusion, out_vec_fusion, 1, -1.0, True, l2_hit_points)
-
-                            l1_fusion = l1_hit_points.item(0)
-
-                            l2_fusion = l2_hit_points.item(0)
-
-                            l1 = np.array([l1_fusion.x, l1_fusion.y, l1_fusion.z])
-
-                            l1 *= 10
-
-                            l2 = np.array([l2_fusion.x, l2_fusion.y, l2_fusion.z])
-
-                            l2 *= 10
+                            l2 = l2 + out_vec_unit * bounding_box_radii
 
                             line_pairs.append([a1, l1])
 
                             line_pairs.append([a2, l2])
+
+                            #Add to clipped faces
+
+                            voro_face = VoronoiFace()
+
+                            voro_face.edges.append([a1, a2])
+
+                            voro_face.edges.append([a2, l2])
+
+                            voro_face.edges.append([l2, l1])
+
+                            voro_face.edges.append([l1, a1])
+
+                            clipped_faces.append(voro_face)
 
                         j += 1
 
@@ -235,17 +243,45 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                         cell.faces.append(face)
 
-                voronoi_cells.append(cell)
+                if has_infinity == False:
 
-        #create finite faces
+                    voronoi_cells.append(cell)
+
+        #create finite cells
 
         for cell in voronoi_cells:
 
+            #create the brep
+
+            cell_brep_def = adsk.fusion.BRepBodyDefinition.create()
+
+            cell_points = []
+
+            for vertex_index in cell.vertex_indices:
+
+                if vertex_index != -1:
+
+                    cell_points.append(vertices[vertex_index])
+
+            cell_points = np.array(cell_points)
+
+            cell_center = cell_points.mean(axis=0) # find the center of the cell
+
             for face in cell.faces:
 
-                curves = []
+                edge_defs = []
+
+                face_vec1 = None
+
+                face_vec2 = None
+
+                face_normal = None
+
+                face_point = None
 
                 for edge in face.edges:
+
+                    #get the edge vertices and convert to fusion points
 
                     start = vertices[edge[0]]
 
@@ -255,21 +291,111 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                     end_point = adsk.core.Point3D.create(end[0]*0.1, end[1]*0.1, end[2]*0.1)
 
-                    line_segment = adsk.core.Line3D.create(start_point, end_point)
+                    #construct the face normal and point
 
-                    curves.append(line_segment)
+                    if face_vec1 is None:
 
-                wirebody, edgeMap = temp_brep_mgr.createWireFromCurves(curves)
+                        face_vec1 = start - end
+                        
+                    elif face_vec2 is None:
 
-                wire_bodies = []
+                        face_vec2 = start - end
 
-                wire_bodies.append(wirebody)
+                    elif face_normal is None:
 
-                brep_face = temp_brep_mgr.createFaceFromPlanarWires(wire_bodies)
+                        face_normal = np.cross(face_vec1, face_vec2) * 2
 
-                body = bodies.add(brep_face, base_feature)
+                        if not np.any(face_normal):
+
+                            face_normal = None
+
+                        else:
+
+                            face_point = adsk.core.Point3D.create(start[0]*0.1, start[1]*0.1, start[2]*0.1)
+
+                            face_offset1 = start + face_normal
+
+                            face_offset2 = start - face_normal
+
+                            offset_dist1 = np.linalg.norm(face_offset1 - cell_center)
+
+                            offset_dist2 = np.linalg.norm(face_offset2 - cell_center)
+
+                            if offset_dist2 > offset_dist1:
+
+                                face_normal = -face_normal
+
+                            face_normal = adsk.core.Vector3D.create(face_normal[0], face_normal[1], face_normal[2])
+
+                    #create the edge definition
+
+                    edge_defs.append(create_edge_def(cell_brep_def, start_point, end_point))
+
+                face_plane = adsk.core.Plane.create(face_point, face_normal)
+
+                create_face_for_body_def(cell_brep_def, face_plane, edge_defs)
+
+            cell_brep = cell_brep_def.createBody()
+
+            body = bodies.add(cell_brep, base_feature)
+
+            body_coll = adsk.core.ObjectCollection.create()
+
+            body_coll.add(body)
+
+            val_input = adsk.core.ValueInput.createByString("0.25 mm")
+
+            stitch_input = stitch_features.createInput(body_coll, val_input, adsk.fusion.FeatureOperations.NewBodyFeatureOperation)
+
+            stitch_input.targetBaseFeature = base_feature
+
+            stitch_features.add(stitch_input)
+
+            base_bodies = base_feature.bodies
+
+            b_count = base_bodies.count
+
+            cell_body = base_bodies.item(b_count - 1)
+
+            cell_body_copy = temp_brep_mgr.copy(cell_body)
+
+            tool = temp_brep_mgr.copy(complex_boundary)
+
+            temp_brep_mgr.booleanOperation(cell_body_copy, tool, adsk.fusion.BooleanTypes.IntersectionBooleanType)
+
+            base_feature.updateBody(cell_body, cell_body_copy)
 
         adsk.doEvents()
+
+        # for face in clipped_faces:
+
+        #     curves = []
+
+        #     for edge in face.edges:
+
+        #         start = edge[0]
+
+        #         end = edge[1]
+
+        #         start_point = adsk.core.Point3D.create(start[0]*0.1, start[1]*0.1, start[2]*0.1)
+
+        #         end_point = adsk.core.Point3D.create(end[0]*0.1, end[1]*0.1, end[2]*0.1)
+
+        #         line_segment = adsk.core.Line3D.create(start_point, end_point)
+
+        #         curves.append(line_segment)
+
+        #     wirebody, edgeMap = temp_brep_mgr.createWireFromCurves(curves)
+
+        #     wire_bodies = []
+
+        #     wire_bodies.append(wirebody)
+
+        #     brep_face = temp_brep_mgr.createFaceFromPlanarWires(wire_bodies)
+
+        #     body = bodies.add(brep_face, base_feature)
+
+        # adsk.doEvents()
 
         self.output.payload = np.array(line_pairs)
 
@@ -283,3 +409,63 @@ class VoronoiCell:
 class VoronoiFace:
     def __init__(self):
         self.edges = []
+
+def create_edge_def(brep_def, start_point, end_point):
+
+    # Create edge definition
+
+    edgeDef = adsk.fusion.BRepEdgeDefinition.cast(None)
+
+    # Create vertex definition
+
+    start_vertex_def = brep_def.createVertexDefinition(start_point)
+
+    end_vertex_def = brep_def.createVertexDefinition(end_point)  
+
+    curve = adsk.core.Line3D.create(start_point, end_point)
+
+    # Create edge definition by curve
+
+    edgeDef = brep_def.createEdgeDefinitionByCurve(start_vertex_def, end_vertex_def, curve)
+    
+    return edgeDef   
+
+def create_face_for_body_def(brep_def, surface, edge_defs):
+
+    # Create face definition
+
+    faceDef = adsk.fusion.BRepFaceDefinition.cast(None)
+    
+    # Create lump definition
+
+    lumpDefs = brep_def.lumpDefinitions
+
+    lumpDef = lumpDefs.add()
+
+    # Create shell definition
+
+    shellDefs = lumpDef.shellDefinitions
+
+    shellDef = shellDefs.add()
+
+    # Create face definition
+
+    faceDefs = shellDef.faceDefinitions
+
+    faceDef = faceDefs.add(surface, True)
+
+    # Create loop definition
+
+    loopDefs = faceDef.loopDefinitions
+
+    loopdef = loopDefs.add()
+    
+    # Create coEdge definitions
+
+    brepCoEdgeDefs = loopdef.bRepCoEdgeDefinitions   
+
+    for edgeDef in edge_defs:
+
+        brepCoEdgeDefs.add(edgeDef, True)
+
+    return faceDef 
