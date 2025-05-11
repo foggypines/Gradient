@@ -70,14 +70,14 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
         #Initial Voronoi calculation
 
-        points = self.point_set.parameter
+        # points = self.point_set.parameter
 
-        # points = np.array([[0, 0, 0], [0, 1, 0], [0, 2, 0], [1, 0, 0], [1, 1, 0], [1, 2, 0],
-        #                 [2, 0, 0], [2, 1, 0], [2, 2, 0],
-        #                 [0, 0, 1], [0, 1, 1], [0, 2, 1], [1, 0, 1], [1, 1, 1], [1, 2, 1],
-        #                 [2, 0, 1], [2, 1, 1], [2, 2, 1],
-        #                 [0, 0, 2], [0, 1, 2], [0, 2, 2], [1, 0, 2], [1, 1, 2], [1, 2, 2],
-        #                 [2, 0, 2], [2, 1, 2], [2, 2, 2]])
+        points = np.array([[0, 0, 0], [0, 1, 0], [0, 2, 0], [1, 0, 0], [1, 1, 0], [1, 2, 0],
+                        [2, 0, 0], [2, 1, 0], [2, 2, 0],
+                        [0, 0, 1], [0, 1, 1], [0, 2, 1], [1, 0, 1], [1, 1, 1], [1, 2, 1],
+                        [2, 0, 1], [2, 1, 1], [2, 2, 1],
+                        [0, 0, 2], [0, 1, 2], [0, 2, 2], [1, 0, 2], [1, 1, 2], [1, 2, 2],
+                        [2, 0, 2], [2, 1, 2], [2, 2, 2]])
 
         vor = Voronoi(points)
 
@@ -123,7 +123,7 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                         cell.ridge_indices.append(i)
 
-                has_infinity = False
+                cell_infinity = any(v == -1 for v in cell.vertex_indices)
 
                 for k in range(len(cell.ridges)):
 
@@ -137,9 +137,7 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                     ridge_point_indices = cell.ridge_indices[k]
 
-                    if has_infinity == False:
-
-                        has_infinity = any(v == -1 for v in ridge)
+                    face_infinity = any(v == -1 for v in ridge)
 
                     while j < edge_len:
 
@@ -151,11 +149,15 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                             t = j + 1
                             
-                        if has_infinity == False:
+                        if cell_infinity == False:
 
-                            v1 = ridge[j]
+                            v1_index = ridge[j]
 
-                            v2 = ridge[t]
+                            v2_index = ridge[t]
+
+                            v1 = vertices[v1_index]
+
+                            v2 = vertices[v2_index]
 
                             pair = [v1, v2]
 
@@ -239,11 +241,9 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                         j += 1
 
-                    if has_infinity == False:
-
                         cell.faces.append(face)
 
-                if has_infinity == False:
+                if cell_infinity == False:
 
                     voronoi_cells.append(cell)
 
@@ -283,9 +283,9 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
                     #get the edge vertices and convert to fusion points
 
-                    start = vertices[edge[0]]
+                    start = edge[0]
 
-                    end = vertices[edge[1]]
+                    end = edge[1]
 
                     start_point = adsk.core.Point3D.create(start[0]*0.1, start[1]*0.1, start[2]*0.1)
 
@@ -367,35 +367,35 @@ class VoronoiNodeFunction(BaseNodeFunction):
 
         adsk.doEvents()
 
-        # for face in clipped_faces:
+        for face in clipped_faces:
 
-        #     curves = []
+            curves = []
 
-        #     for edge in face.edges:
+            for edge in face.edges:
 
-        #         start = edge[0]
+                start = edge[0]
 
-        #         end = edge[1]
+                end = edge[1]
 
-        #         start_point = adsk.core.Point3D.create(start[0]*0.1, start[1]*0.1, start[2]*0.1)
+                start_point = adsk.core.Point3D.create(start[0]*0.1, start[1]*0.1, start[2]*0.1)
 
-        #         end_point = adsk.core.Point3D.create(end[0]*0.1, end[1]*0.1, end[2]*0.1)
+                end_point = adsk.core.Point3D.create(end[0]*0.1, end[1]*0.1, end[2]*0.1)
 
-        #         line_segment = adsk.core.Line3D.create(start_point, end_point)
+                line_segment = adsk.core.Line3D.create(start_point, end_point)
 
-        #         curves.append(line_segment)
+                curves.append(line_segment)
 
-        #     wirebody, edgeMap = temp_brep_mgr.createWireFromCurves(curves)
+            wirebody, edgeMap = temp_brep_mgr.createWireFromCurves(curves)
 
-        #     wire_bodies = []
+            wire_bodies = []
 
-        #     wire_bodies.append(wirebody)
+            wire_bodies.append(wirebody)
 
-        #     brep_face = temp_brep_mgr.createFaceFromPlanarWires(wire_bodies)
+            brep_face = temp_brep_mgr.createFaceFromPlanarWires(wire_bodies)
 
-        #     body = bodies.add(brep_face, base_feature)
+            body = bodies.add(brep_face, base_feature)
 
-        # adsk.doEvents()
+        adsk.doEvents()
 
         self.output.payload = np.array(line_pairs)
 
